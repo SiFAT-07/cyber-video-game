@@ -1,0 +1,7 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.university.cyberwalk.UpgradeToJava21
+displayName: Upgrade CyberWalk to Java 21
+description: Migrates the CyberWalk project from Java 17 to Java 21
+recipeList:
+  - org.openrewrite.java.migrate.UpgradeToJava21

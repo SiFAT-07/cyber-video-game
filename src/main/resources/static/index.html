@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberWalk - Interactive Story Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Score Display -->
+    <div id="scoreContainer">
+        <div class="score-label">Score:</div>
+        <div id="score" class="score-value">0</div>
+    </div>
+
+    <!-- Video Container -->
+    <div id="videoContainer">
+        <video id="mainVideo" controls>
+            <source src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Options Overlay (Hidden by default) -->
+        <div id="optionsOverlay" class="hidden">
+            <div id="optionButtons"></div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden">
+            <div class="loader"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="hidden">
+        <div class="game-over-content">
+            <h1>Game Complete!</h1>
+            <p>Your Final Score: <span id="finalScore">0</span></p>
+            <button id="restartButton" class="btn btn-primary">Play Again</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
