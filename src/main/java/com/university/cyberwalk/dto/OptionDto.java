@@ -11,7 +11,8 @@ public class OptionDto {
     private Long id;
     private String label;
     private String targetVideoId;
-    private int scoreChange;
+    private int defenderScoreDelta;
+    private int attackerScoreDelta;
     private String position;
     private String interactionType;
 }

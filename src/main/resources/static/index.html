@@ -7,37 +7,85 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Score Display -->
-    <div id="scoreContainer">
-        <div class="score-label">Score:</div>
-        <div id="score" class="score-value">0</div>
+    <!-- Lobby Screen -->
+    <div id="lobbyScreen">
+        <h1>CyberWalk: Duel Mode</h1>
+        <div class="lobby-controls">
+            <div class="card">
+                <h3>Create Room</h3>
+                <button id="createRoomBtn" class="btn btn-primary">Create New Room</button>
+            </div>
+            <div class="card">
+                <h3>Join Room</h3>
+                <input type="text" id="roomIdInput" placeholder="Enter Room ID">
+                <select id="roleSelect">
+                    <option value="ATTACKER">Attacker (Red Team)</option>
+                    <option value="DEFENDER">Defender (Blue Team)</option>
+                </select>
+                <button id="joinRoomBtn" class="btn btn-secondary">Join Game</button>
+            </div>
+        </div>
+        <div id="lobbyStatus" class="status-msg"></div>
     </div>
 
-    <!-- Video Container -->
-    <div id="videoContainer">
-        <video id="mainVideo" controls>
-            <source src="" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <!-- Attacker Dashboard -->
+    <div id="attackerDashboard" class="hidden">
+        <div class="dashboard-header">
+            <h2>Attacker Control Panel</h2>
+            <div class="room-info">Room: <span id="attackerRoomId"></span></div>
+             <div class="score-board">
+                Attacker: <span id="attackerScoreValue">0</span> | Defender: <span id="defenderScoreValueAtk">0</span>
+            </div>
+        </div>
+        <div id="attackSelectionArea" class="hidden">
+            <h3>Select Attack Vector</h3>
+            <div class="attack-cards">
+                <button class="attack-card" data-attack="OFFICE_FAKE">Deepfake Call</button>
+                <button class="attack-card" data-attack="MFA_FAKE">MFA Fatigue</button>
+                <button class="attack-card" data-attack="WIFI_ATTACK">Fake Wi-Fi</button>
+            </div>
+        </div>
+        <div id="attackerLogArea">
+            <h3>Mission Log</h3>
+            <ul id="missionLog"></ul>
+        </div>
+    </div>
 
-        <!-- Options Overlay (Hidden by default) -->
-        <div id="optionsOverlay" class="hidden">
-            <div id="optionButtons"></div>
+    <!-- Defender Game Area (Existing structure wrapped) -->
+    <div id="defenderGameArea" class="hidden">
+        <!-- Score Display -->
+        <div id="scoreContainer">
+            <div class="score-label">Defender Score:</div>
+            <div id="defenderScoreValue">0</div>
         </div>
 
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="hidden">
-            <div class="loader"></div>
-            <p>Loading...</p>
+        <!-- Video Container -->
+        <div id="videoContainer">
+            <video id="mainVideo" controls>
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Options Overlay (Hidden by default) -->
+            <div id="optionsOverlay" class="hidden">
+                <div id="optionButtons"></div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden">
+                <div class="loader"></div>
+                <p>Waiting for Attacker...</p>
+            </div>
         </div>
     </div>
 
     <!-- Game Over Screen -->
     <div id="gameOverScreen" class="hidden">
         <div class="game-over-content">
-            <h1>Game Complete!</h1>
-            <p>Your Final Score: <span id="finalScore">0</span></p>
-            <button id="restartButton" class="btn btn-primary">Play Again</button>
+            <h1>Round Complete!</h1>
+            <p>Defender Score: <span id="finalDefenderScore">0</span></p>
+            <p>Attacker Score: <span id="finalAttackerScore">0</span></p>
+            <button id="restartButton" class="btn btn-primary">Back to Lobby</button>
         </div>
     </div>
 
