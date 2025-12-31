@@ -13,6 +13,8 @@ public class ScenarioResponse {
     private String videoId;
     private String videoPath;
     private String description;
+    private String attackerDescription;
+    private String attackType;
     private boolean isLeafNode;
     private List<OptionDto> options;
 }

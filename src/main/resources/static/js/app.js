@@ -1,260 +1,220 @@
 // API Configuration
 const API_BASE_URL = "http://localhost:8080/api";
 
-// Game State
-let currentSession = null;
-let currentScore = 0;
-let currentVideoId = "1";
-let currentScenario = null;
+// State
+let myRoomId = null;
+let myRole = null;
+let pollInterval = null;
+let lastKnownState = null;
 
 // DOM Elements
+const lobbyScreen = document.getElementById("lobbyScreen");
+const attackerDashboard = document.getElementById("attackerDashboard");
+const defenderGameArea = document.getElementById("defenderGameArea");
+const lobbyStatus = document.getElementById("lobbyStatus");
 const videoElement = document.getElementById("mainVideo");
-const scoreElement = document.getElementById("score");
-const optionsOverlay = document.getElementById("optionsOverlay");
 const optionButtons = document.getElementById("optionButtons");
-const loadingIndicator = document.getElementById("loadingIndicator");
-const gameOverScreen = document.getElementById("gameOverScreen");
-const finalScoreElement = document.getElementById("finalScore");
-const restartButton = document.getElementById("restartButton");
+const optionsOverlay = document.getElementById("optionsOverlay");
 
-// Initialize Game
-async function initializeGame() {
-  try {
-    showLoading();
+// --- Lobby Functions ---
 
-    // Start a new game session
-    const sessionResponse = await fetch(`${API_BASE_URL}/session/start`, {
-      method: "POST",
-    });
-
-    if (!sessionResponse.ok) {
-      throw new Error("Failed to start session");
+async function createRoom() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/room/create`, { method: "POST" });
+        const room = await response.json();
+        myRoomId = room.roomId;
+        document.getElementById("roomIdInput").value = myRoomId;
+        lobbyStatus.textContent = `Room Created! ID: ${myRoomId}. Join as a role below.`;
+    } catch (e) {
+        console.error(e);
+        lobbyStatus.textContent = "Error creating room.";
     }
-
-    currentSession = await sessionResponse.json();
-    currentScore = currentSession.currentScore;
-    currentVideoId = currentSession.currentVideoId;
-
-    updateScoreDisplay();
-    await loadScenario(currentVideoId);
-
-    hideLoading();
-  } catch (error) {
-    console.error("Error initializing game:", error);
-    alert("Failed to start the game. Please refresh the page.");
-    hideLoading();
-  }
 }
 
-// Load Scenario
-async function loadScenario(videoId) {
-  try {
-    showLoading();
+async function joinRoom() {
+    const roomIdInput = document.getElementById("roomIdInput").value.trim();
+    const roleSelect = document.getElementById("roleSelect").value;
 
-    const response = await fetch(`${API_BASE_URL}/scenarios/${videoId}`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to load scenario: ${videoId}`);
+    if (!roomIdInput) {
+        lobbyStatus.textContent = "Please enter a Room ID.";
+        return;
     }
 
-    currentScenario = await response.json();
-    currentVideoId = videoId;
-
-    // Load and play video
-    videoElement.src = currentScenario.videoPath;
-    videoElement.load();
-
-    // Hide options initially
-    hideOptions();
-
-    // Wait for video to be ready
-    videoElement.addEventListener(
-      "loadeddata",
-      () => {
-        hideLoading();
-        videoElement.play().catch((e) => {
-          console.error("Error playing video:", e);
-          // On mobile, user interaction is required
-          alert("Please tap to start the video");
+    try {
+        const response = await fetch(`${API_BASE_URL}/room/join`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ roomId: roomIdInput, role: roleSelect })
         });
-      },
-      { once: true }
-    );
 
-    // Show options when video ends
-    videoElement.addEventListener("ended", handleVideoEnd, { once: true });
-  } catch (error) {
-    console.error("Error loading scenario:", error);
-    alert(`Failed to load scenario: ${videoId}`);
-    hideLoading();
-  }
+        if (!response.ok) throw new Error("Join failed");
+
+        const room = await response.json();
+        myRoomId = room.roomId;
+        myRole = roleSelect;
+        
+        enterGameMode();
+    } catch (e) {
+        console.error(e);
+        lobbyStatus.textContent = "Failed to join. Room might be full or invalid.";
+    }
 }
 
-// Handle Video End
-function handleVideoEnd() {
-  if (currentScenario.isLeafNode) {
-    // This is the end of a path - show game over
-    showGameOver();
-  } else {
-    // Show options for the next choice
-    displayOptions();
-  }
-}
-
-// Display Options
-function displayOptions() {
-  // Clear previous options
-  optionButtons.innerHTML = "";
-
-  if (!currentScenario.options || currentScenario.options.length === 0) {
-    return;
-  }
-
-  currentScenario.options.forEach((option) => {
-    const button = document.createElement("button");
-    button.className = "option-btn";
-    button.textContent = option.label;
-
-    // Add position class
-    if (option.position === "bottom-left") {
-      button.classList.add("left");
-    } else if (option.position === "bottom-right") {
-      button.classList.add("right");
+function enterGameMode() {
+    lobbyScreen.classList.add("hidden");
+    
+    if (myRole === "ATTACKER") {
+        attackerDashboard.classList.remove("hidden");
+        document.getElementById("attackerRoomId").textContent = myRoomId;
+    } else {
+        defenderGameArea.classList.remove("hidden");
     }
 
-    // Add score-based styling
-    if (option.scoreChange > 0) {
-      button.classList.add("positive");
-    } else if (option.scoreChange < 0) {
-      button.classList.add("negative");
-    }
-
-    // Add click handler
-    button.addEventListener("click", () => handleOptionClick(option));
-
-    optionButtons.appendChild(button);
-  });
-
-  showOptions();
+    // Start Polling
+    pollInterval = setInterval(pollGameState, 1500);
 }
 
-// Handle Option Click
-async function handleOptionClick(option) {
-  try {
-    hideOptions();
-    showLoading();
+// --- Game Logic ---
 
-    // Send choice to backend
-    const response = await fetch(`${API_BASE_URL}/session/choice`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sessionId: currentSession.sessionId,
-        optionId: option.id,
-        targetVideoId: option.targetVideoId,
-        scoreChange: option.scoreChange,
-      }),
+async function pollGameState() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/room/${myRoomId}/status`);
+        const room = await response.json();
+        
+        updateUI(room);
+        lastKnownState = room;
+    } catch (e) {
+        console.error("Polling error", e);
+    }
+}
+
+function updateUI(room) {
+    // Score Updates
+    if (myRole === "ATTACKER") {
+        document.getElementById("attackerScoreValue").textContent = room.attackerScore;
+        document.getElementById("defenderScoreValueAtk").textContent = room.defenderScore;
+    } else {
+        document.getElementById("defenderScoreValue").textContent = room.defenderScore;
+    }
+
+    // State Machine
+    if (room.status === "ATTACK_SELECTION") {
+        if (myRole === "ATTACKER") {
+            document.getElementById("attackSelectionArea").classList.remove("hidden");
+        } else {
+            // Defender Waiting
+            document.getElementById("loadingIndicator").classList.remove("hidden");
+            document.querySelector("#loadingIndicator p").textContent = "Waiting for Attacker to select a scenario...";
+        }
+    } else if (room.status === "DEFENDER_TURN") {
+        document.getElementById("loadingIndicator").classList.add("hidden");
+        
+        if (myRole === "ATTACKER") {
+            document.getElementById("attackSelectionArea").classList.add("hidden");
+            // Show log?
+        } else {
+            // Defender Playing
+            if (!lastKnownState || lastKnownState.currentVideoId !== room.currentVideoId) {
+                loadScenarioForDefender(room.currentVideoId);
+            }
+        }
+    } else if (room.status === "ROUND_OVER") {
+        clearInterval(pollInterval);
+        showGameOver(room);
+    }
+}
+
+// --- Attacker Actions ---
+
+document.querySelectorAll(".attack-card").forEach(btn => {
+    btn.addEventListener("click", () => {
+        selectAttack(btn.dataset.attack);
     });
+});
 
-    if (!response.ok) {
-      throw new Error("Failed to record choice");
+async function selectAttack(attackType) {
+    try {
+        await fetch(`${API_BASE_URL}/room/${myRoomId}/attack`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ roomId: myRoomId, attackType: attackType })
+        });
+        logMessage(`Selected attack: ${attackType}`);
+    } catch (e) {
+        console.error(e);
     }
-
-    const updatedSession = await response.json();
-    currentScore = updatedSession.currentScore;
-    updateScoreDisplay();
-
-    // Load next scenario
-    await loadScenario(option.targetVideoId);
-  } catch (error) {
-    console.error("Error handling option click:", error);
-    alert("Failed to process your choice. Please try again.");
-    hideLoading();
-    displayOptions(); // Show options again
-  }
 }
 
-// Show Game Over
-async function showGameOver() {
-  try {
-    // Complete the session
-    await fetch(
-      `${API_BASE_URL}/session/complete/${currentSession.sessionId}`,
-      {
-        method: "POST",
-      }
-    );
-  } catch (error) {
-    console.error("Error completing session:", error);
-  }
-
-  finalScoreElement.textContent = currentScore;
-  gameOverScreen.classList.remove("hidden");
+function logMessage(msg) {
+    const log = document.getElementById("missionLog");
+    const li = document.createElement("li");
+    li.textContent = msg;
+    log.appendChild(li);
 }
 
-// Restart Game
-function restartGame() {
-  gameOverScreen.classList.add("hidden");
-  currentSession = null;
-  currentScore = 0;
-  currentVideoId = "1";
-  currentScenario = null;
+// --- Defender Actions ---
 
-  // Reset video
-  videoElement.pause();
-  videoElement.currentTime = 0;
-
-  // Restart game
-  initializeGame();
+async function loadScenarioForDefender(videoId) {
+    try {
+         const response = await fetch(`${API_BASE_URL}/scenarios/${videoId}`);
+         const scenario = await response.json();
+         
+         videoElement.src = scenario.videoPath;
+         videoElement.load();
+         optionsOverlay.classList.add("hidden");
+         
+         videoElement.play().catch(e => console.log("Auto-play blocked", e));
+         
+         videoElement.onended = () => {
+             if (scenario.leafNode) {
+                 // Wait for round over signal or score
+             } else {
+                 showOptions(scenario.options);
+             }
+         };
+    } catch (e) {
+        console.error(e);
+    }
 }
 
-// Update Score Display
-function updateScoreDisplay() {
-  scoreElement.textContent = currentScore;
-
-  // Add animation effect
-  scoreElement.style.transform = "scale(1.3)";
-  setTimeout(() => {
-    scoreElement.style.transform = "scale(1)";
-  }, 300);
+function showOptions(options) {
+    optionButtons.innerHTML = "";
+    optionsOverlay.classList.remove("hidden");
+    
+    options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.label;
+        btn.onclick = () => sendDefenderAction(opt.id);
+        
+        // Positioning
+        if (opt.position === "bottom-left") btn.classList.add("left");
+        if (opt.position === "bottom-right") btn.classList.add("right");
+        
+        optionButtons.appendChild(btn);
+    });
 }
 
-// UI Helper Functions
-function showOptions() {
-  optionsOverlay.classList.remove("hidden");
+async function sendDefenderAction(optionId) {
+    optionsOverlay.classList.add("hidden");
+    try {
+        await fetch(`${API_BASE_URL}/room/${myRoomId}/action`, {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify({ roomId: myRoomId, optionId: optionId })
+        });
+    } catch (e) {
+        console.error(e);
+    }
 }
 
-function hideOptions() {
-  optionsOverlay.classList.add("hidden");
+function showGameOver(room) {
+    document.getElementById("gameOverScreen").classList.remove("hidden");
+    document.getElementById("finalDefenderScore").textContent = room.defenderScore;
+    document.getElementById("finalAttackerScore").textContent = room.attackerScore;
 }
 
-function showLoading() {
-  loadingIndicator.classList.remove("hidden");
-}
-
-function hideLoading() {
-  loadingIndicator.classList.add("hidden");
-}
-
-// Event Listeners
-restartButton.addEventListener("click", restartGame);
-
-// Handle video errors
-videoElement.addEventListener("error", (e) => {
-  console.error("Video error:", e);
-  hideLoading();
-  alert("Error loading video. Please check if the video file exists.");
-});
-
-// Prevent right-click on video (optional - for production)
-videoElement.addEventListener("contextmenu", (e) => {
-  e.preventDefault();
-});
-
-// Start the game when page loads
-window.addEventListener("load", initializeGame);
-
-// Add smooth transition for score changes
-scoreElement.style.transition = "transform 0.3s ease";
+// Initial Bindings
+document.getElementById("createRoomBtn").addEventListener("click", createRoom);
+document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
+document.getElementById("restartButton").addEventListener("click", () => location.reload());
