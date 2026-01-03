@@ -26,13 +26,13 @@ public class DataInitializer implements CommandLineRunner {
         // Create main scenario (video 1)
         Scenario scenario1 = new Scenario();
         scenario1.setVideoId("1");
-        scenario1.setVideoPath("/video/1.mp4");
+        scenario1.setVideoPath("/video/spam_mail_coming.mp4");
         scenario1.setDescription("Office: Your phone is ringing. Caller ID says 'IT Helpdesk'.");
         scenario1.setLeafNode(false);
 
         // Create options for scenario 1
         Option option1_1 = new Option();
-        option1_1.setLabel("Answer Call");
+        option1_1.setLabel("Mail CITS");
         option1_1.setTargetVideoId("1_1");
         option1_1.setDefenderScoreDelta(Option.SCORE_PLUS);
         option1_1.setAttackerScoreDelta(0);
@@ -41,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
         option1_1.setScenario(scenario1);
 
         Option option1_2 = new Option();
-        option1_2.setLabel("Ignore Call");
+        option1_2.setLabel("Ignore Spam");
         option1_2.setTargetVideoId("1_2");
         option1_2.setDefenderScoreDelta(Option.SCORE_MINUS);
         option1_2.setAttackerScoreDelta(10);
@@ -55,7 +55,7 @@ public class DataInitializer implements CommandLineRunner {
         // Create scenario for video 1_1
         Scenario scenario1_1 = new Scenario();
         scenario1_1.setVideoId("1_1");
-        scenario1_1.setVideoPath("/video/1_1.mp4");
+        scenario1_1.setVideoPath("/video/send_mail_to_cits.mp4");
         scenario1_1.setDescription("You answered. The caller asks for your password.");
         scenario1_1.setLeafNode(true); // For prototype, end here
         scenario1_1.setOptions(new ArrayList<>());
@@ -64,7 +64,7 @@ public class DataInitializer implements CommandLineRunner {
         // Create scenario for video 1_2
         Scenario scenario1_2 = new Scenario();
         scenario1_2.setVideoId("1_2");
-        scenario1_2.setVideoPath("/video/1_2.mp4");
+        scenario1_2.setVideoPath("/video/ignore_spam_mail.mp4");
         scenario1_2.setDescription("You ignored the call. It might have been important.");
         scenario1_2.setLeafNode(true);
         scenario1_2.setOptions(new ArrayList<>());
