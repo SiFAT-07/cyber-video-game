@@ -7,8 +7,14 @@ let myRole = null;
 let pollInterval = null;
 let lastKnownState = null;
 
-// DOM Elements
-const lobbyScreen = document.getElementById("lobbyScreen");
+// DOM Elements - New Design
+const screens = document.querySelectorAll('.screen');
+const volumeVal = document.getElementById('volume-val');
+const brightnessVal = document.getElementById('brightness-val');
+const app = document.getElementById('app');
+
+// DOM Elements - Game
+const roomSelectionScreen = document.getElementById("roomSelectionScreen"); // Renamed from lobbyScreen
 const attackerDashboard = document.getElementById("attackerDashboard");
 const defenderGameArea = document.getElementById("defenderGameArea");
 const lobbyStatus = document.getElementById("lobbyStatus");
@@ -16,7 +22,74 @@ const videoElement = document.getElementById("mainVideo");
 const optionButtons = document.getElementById("optionButtons");
 const optionsOverlay = document.getElementById("optionsOverlay");
 
-// --- Lobby Functions ---
+// --- Initialization & New Design Logic ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Simulate loading for the new cinematic intro
+    setTimeout(() => {
+        showScreen('lobby-screen');
+    }, 2500);
+});
+
+// Navigation Logic
+function showScreen(screenId) {
+    // Hide all cinematic screens
+    screens.forEach(s => {
+        s.classList.remove('active');
+    });
+    
+    // Hide game components just in case
+    if (screenId === 'lobby-screen') {
+        hideGameComponents();
+        if(app) app.style.display = 'block'; // Ensure app is visible when returning to lobby
+    }
+    
+    const target = document.getElementById(screenId);
+    if (target) {
+        target.classList.add('active');
+    }
+}
+
+// Game Controls (New Lobby)
+function startGame() {
+    // Hide the main menu lobby container completely so it doesn't take up space
+    if(app) app.style.display = 'none';
+    
+    // Show the Room Selection Screen (Old Lobby)
+    roomSelectionScreen.classList.remove("hidden");
+}
+
+function exitGame() {
+    if (confirm('Are you sure you want to exit?')) {
+        window.close();
+        // In case window.close() is blocked (common in browsers)
+        alert('Systems powered down.');
+    }
+}
+
+// Settings Logic
+function updateSetting(type, value) {
+    if (type === 'volume') {
+        if(volumeVal) volumeVal.textContent = `${value}%`;
+        // In a real game, you'd set audio gain here
+    } else if (type === 'brightness') {
+        if(brightnessVal) brightnessVal.textContent = `${value}%`;
+        // Apply brightness filter to the app container
+        const filterVal = value / 100;
+        if(app) app.style.filter = `brightness(${filterVal})`;
+    }
+}
+
+function hideGameComponents() {
+    roomSelectionScreen.classList.add("hidden");
+    attackerDashboard.classList.add("hidden");
+    defenderGameArea.classList.add("hidden");
+    document.getElementById("gameOverScreen").classList.add("hidden");
+    if(pollInterval) clearInterval(pollInterval);
+}
+
+
+// --- Lobby Functions (Room Selection) ---
 
 async function createRoom() {
     try {
@@ -61,7 +134,7 @@ async function joinRoom() {
 }
 
 function enterGameMode() {
-    lobbyScreen.classList.add("hidden");
+    roomSelectionScreen.classList.add("hidden");
     
     if (myRole === "ATTACKER") {
         attackerDashboard.classList.remove("hidden");
@@ -217,4 +290,4 @@ function showGameOver(room) {
 // Initial Bindings
 document.getElementById("createRoomBtn").addEventListener("click", createRoom);
 document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
-document.getElementById("restartButton").addEventListener("click", () => location.reload());
+document.getElementById("restartButton").addEventListener("click", () => location.reload()); // Reloads page, restarting from loading screen

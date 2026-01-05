@@ -4,38 +4,216 @@
   box-sizing: border-box;
 }
 
+:root {
+    /* Colors from reference images */
+    --accent-blue: #00d2ff;
+    --accent-orange: #f39c12;
+    --bg-dark: #0f172a;
+    --bg-glass: rgba(15, 23, 42, 0.7);
+    --border-glass: rgba(255, 255, 255, 0.2);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    
+    /* Layout */
+    --transition-speed: 0.4s;
+    --border-radius: 8px;
+}
+
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #050510; /* Deep dark blue */
-  background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050510 100%);
-  color: #fff;
+  font-family: 'Inter', "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-dark); /* Deep dark blue */
+  /* background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050510 100%); Override with new lobby bg if needed, but keeping base for other screens */
+  color: var(--text-primary);
   overflow: hidden;
   height: 100vh;
   width: 100vw;
 }
 
-/* --- Lobby Styles --- */
-#lobbyScreen {
+/* --- New App Structure & Lobby --- */
+
+#app {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    /* Optional: Brightness filter for settings is applied here */
+}
+
+/* Screen Management */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity var(--transition-speed) ease, visibility var(--transition-speed);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 50; /* Above normal content but below overlays if any */
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Glassmorphism utility */
+.glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius);
+}
+
+/* New Lobby Specifics */
+#lobby-screen {
+    /* Using the new high-res cyberpunk background */
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('../img/bg.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.lobby-content {
+    /* Styles inline in HTML were: position: absolute; bottom: 10%; width: 100%; padding: 0 5%; */
+}
+
+/* Settings Overlay */
+.modal-content {
+    /* Styles inline in HTML mostly, but good to have base class */
+}
+
+/* --- Buttons (New Design) --- */
+.btn {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-glass);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+    border-radius: 0; /* Override existing radius if any */
+}
+
+/* Specific override for existing buttons to match new style if desired, or keep separate. 
+   Existing .btn was different. We are redefining .btn here. 
+   The old .btn-primary and .btn-secondary will need to adapt. */
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: 0.5s;
+}
+
+.btn:hover::after {
+    left: 100%;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+    transform: none; /* Reset transform from old css if conflicting */
+}
+
+/* Preserving old .btn-primary colors but using new shape/effects if possible, 
+   OR just letting specific classes override. */
+.btn.primary { border-color: var(--accent-blue); }
+.btn.secondary { border-color: var(--accent-orange); }
+
+/* --- Range Sliders --- */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    height: 18px;
+    width: 32px;
+    border-radius: 4px;
+    background: var(--text-primary);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -6px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--accent-blue);
+}
+
+input[type=range]:hover::-webkit-slider-runnable-track {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Loading Animations --- */
+/* The old loader was similar but slightly different. Merging. */
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* =========================================
+   EXISTING STYLES (Adapted)
+   ========================================= */
+
+/* Use a specialized ID for the old lobby screen to act as the "Room Selection" screen now */
+#roomSelectionScreen {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    width: 100vw;
-    background: url('https://w.wallhaven.cc/full/8o/wallhaven-8oglqy.png') no-repeat center center/cover; /* Placeholder Cyberpunk BG */
-    position: relative;
-    z-index: 10;
+    height: 100%;
+    width: 100%;
+    background: url('../img/bg2.png') no-repeat center center/cover;
+    position: absolute; /* Changed from relative */
+    top: 0;
+    left: 0;
+    z-index: 100; /* Increased to ensure visibility over other screens */
 }
 
-#lobbyScreen::before {
+#roomSelectionScreen::before {
     content: "";
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Overlay */
+    background: rgba(0, 0, 0, 0.7);
     z-index: -1;
 }
 
-#lobbyScreen h1 {
+#roomSelectionScreen h1 {
     font-size: 3rem;
     margin-bottom: 2rem;
     text-transform: uppercase;
@@ -92,11 +270,25 @@ input[type="text"]:focus, select:focus {
     box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
 }
 
-.btn-secondary {
+/* Old button classes might need adjustment if using new .btn base.
+   Btn-secondary was:
+    background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+    color: white;
+    border: none;
+*/
+.btn-old-secondary { /* Renamed to avoid partial conflict, or just keep as specific override */
     background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
     color: white;
     border: none;
 }
+/* For now, let's keep specific identifiers for old buttons if we can't fully unify immediately, or allow overlap. */
+.btn.btn-secondary {
+     /* Merger of new .btn and old .btn-secondary colors? */
+     /* New design prefers glass/border styling. */
+     /* existing: */
+     /* border-color: var(--accent-orange); from new */
+}
+
 
 .status-msg {
     margin-top: 2rem;
@@ -108,7 +300,8 @@ input[type="text"]:focus, select:focus {
 /* --- Attacker Dashboard --- */
 #attackerDashboard {
     padding: 2rem;
-    height: 100vh;
+    height: 100%; /* Changed from 100vh */
+    width: 100%;
     display: flex;
     flex-direction: column;
     background: #0f0f1a;
@@ -255,6 +448,7 @@ input[type="text"]:focus, select:focus {
   justify-content: space-between;
   align-items: flex-end;
   pointer-events: none;
+  z-index: 200;
 }
 
 #optionsOverlay.hidden {
@@ -349,25 +543,6 @@ input[type="text"]:focus, select:focus {
   display: none;
 }
 
-.loader {
-  border: 5px solid rgba(255, 255, 255, 0.3);
-  border-top: 5px solid #00ff00;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /* Game Over Screen */
 #gameOverScreen {
   position: fixed;
@@ -411,33 +586,6 @@ input[type="text"]:focus, select:focus {
   font-weight: bold;
   color: #00ff00;
   text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
-}
-
-.btn {
-  padding: 15px 40px;
-  font-size: 20px;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(17, 153, 142, 0.6);
-}
-
-.btn-primary:active {
-  transform: translateY(-1px);
 }
 
 /* Mobile Responsive */
@@ -486,41 +634,5 @@ input[type="text"]:focus, select:focus {
 
   #finalScore {
     font-size: 28px;
-  }
-}
-
-@media (max-width: 480px) {
-  #scoreContainer {
-    padding: 8px 12px;
-  }
-
-  .score-label {
-    font-size: 10px;
-  }
-
-  .score-value {
-    font-size: 20px;
-  }
-
-  .option-btn {
-    padding: 12px 20px;
-    font-size: 14px;
-  }
-
-  .game-over-content h1 {
-    font-size: 28px;
-  }
-
-  .game-over-content p {
-    font-size: 16px;
-  }
-
-  #finalScore {
-    font-size: 24px;
-  }
-
-  .btn {
-    padding: 12px 30px;
-    font-size: 16px;
   }
 }
