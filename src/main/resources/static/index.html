@@ -102,14 +102,47 @@
                 Attacker: <span id="attackerScoreValue">0</span> | Defender: <span id="defenderScoreValueAtk">0</span>
             </div>
             <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
+            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
         </div>
-        <div id="attackSelectionArea" class="hidden">
-            <h3>Select Attack Vector</h3>
-            <div class="attack-cards">
-                <button class="attack-card" data-attack="OFFICE_FAKE">Deepfake Call</button>
-                <button class="attack-card" data-attack="MFA_FAKE">MFA Fatigue</button>
-                <button class="attack-card" data-attack="WIFI_ATTACK">Fake Wi-Fi</button>
+        
+        <!-- Scenario Selection (Stage 1) -->
+        <div id="scenarioSelectionArea" class="hidden">
+            <h3>Select Operation Scenario</h3>
+            <div class="scenario-cards">
+                <div class="scenario-card" onclick="selectScenario(1)">
+                    <h4>Scenario 1: Corporate Espionage</h4>
+                    <p>Target: FinEdge Global</p>
+                    <span class="status active">ACTIVE</span>
+                </div>
+                <div class="scenario-card disabled">
+                    <h4>Scenario 2: Infrastructure</h4>
+                    <p>Locked</p>
+                    <span class="status">LOCKED</span>
+                </div>
+                <div class="scenario-card disabled">
+                    <h4>Scenario 3: Supply Chain</h4>
+                    <p>Locked</p>
+                    <span class="status">LOCKED</span>
+                </div>
+                <div class="scenario-card disabled">
+                    <h4>Scenario 4: Ransomware</h4>
+                    <p>Locked</p>
+                    <span class="status">LOCKED</span>
+                </div>
             </div>
+        </div>
+
+        <!-- Attack Selection (Stage 2) -->
+        <div id="attackSelectionArea" class="hidden">
+            <h3>Select Attack Vectors (Select 2 to Start)</h3>
+            <div class="attack-cards">
+                <button class="attack-card" onclick="toggleAttack('OFFICE_FAKE', this)">Deepfake Call</button>
+                <button class="attack-card" onclick="toggleAttack('MFA_FAKE', this)">MFA Fatigue</button>
+                <button class="attack-card" onclick="toggleAttack('WIFI_ATTACK', this)">Fake Wi-Fi</button>
+                <button class="attack-card" onclick="toggleAttack('PHISHING_GROUP', this)">Group Chat Phishing</button>
+            </div>
+            <button id="initiateAttackBtn" class="btn btn-primary" onclick="confirmAttack()" disabled style="margin-top: 20px; width: 100%;">INITIATE ATTACK</button>
+            <button class="btn secondary" onclick="backToScenarios()" style="margin-top: 10px;">Back to Scenarios</button>
         </div>
         <div id="attackerLogArea">
             <h3>Mission Log</h3>

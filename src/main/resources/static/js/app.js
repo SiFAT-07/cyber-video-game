@@ -6,6 +6,8 @@ let myRoomId = null;
 let myRole = null;
 let pollInterval = null;
 let lastKnownState = null;
+let selectedScenarioId = null;
+let selectedAttacks = [];
 
 // DOM Elements - New Design
 const screens = document.querySelectorAll('.screen');
@@ -21,6 +23,8 @@ const lobbyStatus = document.getElementById("lobbyStatus");
 const videoElement = document.getElementById("mainVideo");
 const optionButtons = document.getElementById("optionButtons");
 const optionsOverlay = document.getElementById("optionsOverlay");
+const scenarioSelectionArea = document.getElementById("scenarioSelectionArea");
+const attackSelectionArea = document.getElementById("attackSelectionArea");
 
 // --- Initialization & New Design Logic ---
 
@@ -166,57 +170,202 @@ function updateUI(room) {
     if (myRole === "ATTACKER") {
         document.getElementById("attackerScoreValue").textContent = room.attackerScore;
         document.getElementById("defenderScoreValueAtk").textContent = room.defenderScore;
+        // Always update dashboard for attacker
+        updateAttackerDashboard(room);
     } else {
         document.getElementById("defenderScoreValue").textContent = room.defenderScore;
-    }
-
-    // State Machine
-    if (room.status === "ATTACK_SELECTION") {
-        if (myRole === "ATTACKER") {
-            document.getElementById("attackSelectionArea").classList.remove("hidden");
-        } else {
+        
+        // Defender Specific State Logic
+        if (room.status === "ATTACK_SELECTION") {
             // Defender Waiting
             document.getElementById("loadingIndicator").classList.remove("hidden");
             document.querySelector("#loadingIndicator p").textContent = "Waiting for Attacker to select a scenario...";
-        }
-    } else if (room.status === "DEFENDER_TURN") {
-        document.getElementById("loadingIndicator").classList.add("hidden");
-        
-        if (myRole === "ATTACKER") {
+            
+            // Ensure other areas hidden
             document.getElementById("attackSelectionArea").classList.add("hidden");
-            // Show log?
-        } else {
+            document.getElementById("scenarioSelectionArea").classList.add("hidden");
+            
+        } else if (room.status === "DEFENDER_TURN") {
+            document.getElementById("loadingIndicator").classList.add("hidden");
+            
             // Defender Playing
             if (!lastKnownState || lastKnownState.currentVideoId !== room.currentVideoId) {
                 loadScenarioForDefender(room.currentVideoId);
             }
         }
-    } else if (room.status === "ROUND_OVER") {
+    }
+
+    if (room.status === "ROUND_OVER") {
         clearInterval(pollInterval);
         showGameOver(room);
     }
 }
 
-// --- Attacker Actions ---
+// --- Attacker Dashboard Logic ---
 
-document.querySelectorAll(".attack-card").forEach(btn => {
-    btn.addEventListener("click", () => {
-        selectAttack(btn.dataset.attack);
-    });
-});
+function updateAttackerDashboard(room) {
+    document.getElementById("attackerRoomId").innerText = room.roomId;
+    document.getElementById("attackerScoreValue").innerText = room.attackerScore;
+    document.getElementById("defenderScoreValueAtk").innerText = room.defenderScore;
 
-async function selectAttack(attackType) {
-    try {
-        await fetch(`${API_BASE_URL}/room/${myRoomId}/attack`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ roomId: myRoomId, attackType: attackType })
-        });
-        logMessage(`Selected attack: ${attackType}`);
-    } catch (e) {
-        console.error(e);
+    // Logic to show appropriate selection screen
+    if (room.status === "ATTACK_SELECTION") {
+        // If no scenario selected yet, show Scenario Selection
+        if (!selectedScenarioId) {
+             scenarioSelectionArea.classList.remove("hidden");
+             attackSelectionArea.classList.add("hidden");
+        } else {
+             // If scenario selected, make sure Attack Selection is visible
+             scenarioSelectionArea.classList.add("hidden");
+             attackSelectionArea.classList.remove("hidden");
+        }
+        
+        // Update Initiate Button State based on Defender Presence
+        const confirmBtn = document.getElementById("initiateAttackBtn");
+        if (!room.defenderSessionId) {
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = "Waiting for Defender...";
+        } else {
+            // Re-evaluate button state based on selection
+            if (selectedAttacks.length === 2) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerText = "INITIATE ATTACK";
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.innerText = `Select ${2 - selectedAttacks.length} more`;
+            }
+        }
+        
+    } else {
+        scenarioSelectionArea.classList.add("hidden");
+        attackSelectionArea.classList.add("hidden");
+    }
+    
+    updateMissionLog(room);
+}
+
+function selectScenario(id) {
+    if (id !== 1) return; // Only Scenario 1 is active
+    
+    selectedScenarioId = id;
+    selectedAttacks = []; // Reset attacks
+    
+    // Update UI
+    scenarioSelectionArea.classList.add("hidden");
+    attackSelectionArea.classList.remove("hidden");
+    
+    // Reset buttons
+    document.querySelectorAll('.attack-card').forEach(btn => btn.classList.remove('selected'));
+    
+    // Check state immediately (though poll will overwrite, good for instant feedback)
+    const confirmBtn = document.getElementById("initiateAttackBtn");
+    // We rely on polling to know about defender, but we can set default disable
+    confirmBtn.disabled = true;
+    confirmBtn.innerText = "Select 2 more"; 
+}
+
+function backToScenarios() {
+    selectedScenarioId = null;
+    selectedAttacks = [];
+    scenarioSelectionArea.classList.remove("hidden");
+    attackSelectionArea.classList.add("hidden");
+}
+
+function toggleAttack(attackType, btnElement) {
+    const index = selectedAttacks.indexOf(attackType);
+    
+    if (index > -1) {
+        // Deselect
+        selectedAttacks.splice(index, 1);
+        btnElement.classList.remove('selected');
+    } else {
+        // Select
+        if (selectedAttacks.length < 2) {
+            selectedAttacks.push(attackType);
+            btnElement.classList.add('selected');
+        } else {
+            // Already 2 selected, maybe hint user?
+            alert("You can only select 2 attacks.");
+        }
+    }
+    
+    // Update Confirm Button - Logic now relies on polling for Defender check, 
+    // but we can do a local check if we had the latest room state.
+    // Since we don't have 'room' here, we'll let the next poll (1.5s) strictly enforce the text,
+    // but we can do a provisional update assuming defender is there for responsiveness, 
+    // or just wait for poll. 
+    // BETTER: Use lastKnownState.
+    
+    const confirmBtn = document.getElementById("initiateAttackBtn");
+    
+    if (lastKnownState && !lastKnownState.defenderSessionId) {
+         confirmBtn.disabled = true;
+         confirmBtn.innerText = "Waiting for Defender...";
+    } else {
+        confirmBtn.disabled = selectedAttacks.length !== 2;
+        confirmBtn.innerText = selectedAttacks.length === 2 ? "INITIATE ATTACK" : `Select ${2 - selectedAttacks.length} more`;
     }
 }
+
+async function confirmAttack() {
+    if (selectedAttacks.length !== 2) return;
+    
+    // Backend only supports 1 attack type for now. 
+    // We send the first one to trigger the state change.
+    // Ideally backend would accept a list.
+    const primaryAttack = selectedAttacks[0]; 
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/room/${myRoomId}/attack`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ attackType: primaryAttack })
+        });
+        const room = await response.json(); // Assuming it returns the updated room state
+        updateUI(room); // Update UI based on new room state
+        addToLog(`Attacks Initiated: ${selectedAttacks.join(" & ")}`);
+        // Reset selections after initiating attack
+        selectedScenarioId = null;
+        selectedAttacks = [];
+    } catch (err) {
+        console.error("Error sending attack:", err);
+    }
+}
+
+function updateMissionLog(room) {
+    // This function can be expanded to update the log based on room state changes
+    // For now, it's a placeholder. The addToLog function handles new entries.
+}
+
+function addToLog(message) {
+    const log = document.getElementById("missionLog");
+    const item = document.createElement("li");
+    item.innerText = `> ${message}`;
+    log.appendChild(item);
+    log.scrollTop = log.scrollHeight; // Scroll to bottom
+}
+
+// --- Attacker Actions ---
+
+// The old selectAttack is replaced by toggleAttack and confirmAttack
+// document.querySelectorAll(".attack-card").forEach(btn => {
+//     btn.addEventListener("click", () => {
+//         selectAttack(btn.dataset.attack);
+//     });
+// });
+
+// async function selectAttack(attackType) {
+//     try {
+//         await fetch(`${API_BASE_URL}/room/${myRoomId}/attack`, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ roomId: myRoomId, attackType: attackType })
+//         });
+//         logMessage(`Selected attack: ${attackType}`);
+//     } catch (e) {
+//         console.error(e);
+//     }
+// }
 
 function logMessage(msg) {
     const log = document.getElementById("missionLog");
@@ -291,3 +440,15 @@ function showGameOver(room) {
 document.getElementById("createRoomBtn").addEventListener("click", createRoom);
 document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
 document.getElementById("restartButton").addEventListener("click", () => location.reload()); // Reloads page, restarting from loading screen
+
+// Expose functions to window for HTML onclick attributes
+window.startGame = startGame;
+window.showScreen = showScreen;
+window.exitGame = exitGame;
+window.updateSetting = updateSetting;
+window.hideGameComponents = hideGameComponents;
+window.selectScenario = selectScenario;
+window.toggleAttack = toggleAttack;
+window.confirmAttack = confirmAttack;
+window.backToScenarios = backToScenarios;
+window.sendDefenderAction = sendDefenderAction;

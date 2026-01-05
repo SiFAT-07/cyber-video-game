@@ -69,7 +69,7 @@ public class GameRoomService {
             throw new RuntimeException("Invalid role");
         }
 
-        if (room.getAttackerSessionId() != null && room.getDefenderSessionId() != null) {
+        if (room.getAttackerSessionId() != null && room.getStatus() == GameRoom.RoomStatus.WAITING) {
             room.setStatus(GameRoom.RoomStatus.ATTACK_SELECTION);
         }
 
@@ -87,6 +87,10 @@ public class GameRoomService {
 
         if (room.getStatus() != GameRoom.RoomStatus.ATTACK_SELECTION) {
             throw new RuntimeException("Not in attack selection phase");
+        }
+
+        if (room.getDefenderSessionId() == null) {
+            throw new RuntimeException("Cannot start attack: Defender has not joined yet");
         }
 
         room.setSelectedAttackType(attackType);
