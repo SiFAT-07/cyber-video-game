@@ -109,6 +109,9 @@ public class GameRoomService {
             case WIFI_ATTACK:
                 room.setCurrentVideoId("3"); // Restaurant Scenario Start (Mock)
                 break;
+            case GROUP_CHAT_LINK:
+                room.setCurrentVideoId("4"); // Group Chat Scenario Start (Mock)
+                break;
             default:
                 room.setCurrentVideoId("1");
         }
