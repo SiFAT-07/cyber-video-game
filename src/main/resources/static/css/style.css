@@ -21,7 +21,8 @@
 
 body {
   font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-dark); /* Deep dark blue */
+  background-color: var(--bg-dark);
+  /* Deep dark blue */
   /* background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050510 100%); Override with new lobby bg if needed, but keeping base for other screens */
   color: var(--text-primary);
   overflow: hidden;
@@ -53,7 +54,8 @@ body {
     visibility var(--transition-speed);
   opacity: 0;
   visibility: hidden;
-  z-index: 50; /* Above normal content but below overlays if any */
+  z-index: 50;
+  /* Above normal content but below overlays if any */
 }
 
 .screen.active {
@@ -79,15 +81,6 @@ body {
   background-position: center;
 }
 
-.lobby-content {
-  /* Styles inline in HTML were: position: absolute; bottom: 10%; width: 100%; padding: 0 5%; */
-}
-
-/* Settings Overlay */
-.modal-content {
-  /* Styles inline in HTML mostly, but good to have base class */
-}
-
 /* --- Buttons (New Design) --- */
 .btn {
   padding: 0.8rem 2rem;
@@ -102,7 +95,8 @@ body {
   color: var(--text-primary);
   position: relative;
   overflow: hidden;
-  border-radius: 0; /* Override existing radius if any */
+  border-radius: 0;
+  /* Override existing radius if any */
 }
 
 /* Specific override for existing buttons to match new style if desired, or keep separate. 
@@ -116,12 +110,10 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
   transition: 0.5s;
 }
 
@@ -133,7 +125,8 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-blue);
   box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
-  transform: none; /* Reset transform from old css if conflicting */
+  transform: none;
+  /* Reset transform from old css if conflicting */
 }
 
 /* Preserving old .btn-primary colors but using new shape/effects if possible, 
@@ -141,6 +134,7 @@ body {
 .btn.primary {
   border-color: var(--accent-blue);
 }
+
 .btn.secondary {
   border-color: var(--accent-orange);
 }
@@ -148,6 +142,7 @@ body {
 /* --- Range Sliders --- */
 input[type="range"] {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   background: transparent;
 }
@@ -211,10 +206,12 @@ input[type="range"]:hover::-webkit-slider-runnable-track {
   height: 100%;
   width: 100%;
   background: url("../img/bg2.png") no-repeat center center/cover;
-  position: absolute; /* Changed from relative */
+  position: absolute;
+  /* Changed from relative */
   top: 0;
   left: 0;
-  z-index: 100; /* Increased to ensure visibility over other screens */
+  z-index: 100;
+  /* Increased to ensure visibility over other screens */
 }
 
 #roomSelectionScreen::before {
@@ -299,13 +296,6 @@ select:focus {
   color: white;
   border: none;
 }
-/* For now, let's keep specific identifiers for old buttons if we can't fully unify immediately, or allow overlap. */
-.btn.btn-secondary {
-  /* Merger of new .btn and old .btn-secondary colors? */
-  /* New design prefers glass/border styling. */
-  /* existing: */
-  /* border-color: var(--accent-orange); from new */
-}
 
 .status-msg {
   margin-top: 2rem;
@@ -317,7 +307,8 @@ select:focus {
 /* --- Attacker Dashboard --- */
 #attackerDashboard {
   padding: 2rem;
-  height: 100%; /* Changed from 100vh */
+  height: 100%;
+  /* Changed from 100vh */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -357,7 +348,7 @@ select:focus {
 
 .score-board span {
   color: #ff4b2b;
-  text-shadow: 0 0 10px rgba(255, 75, 43, 0.8);
+  /* Red for attacker theme */
 }
 
 #attackSelectionArea h3 {
@@ -585,46 +576,41 @@ select:focus {
   gap: 20px;
 }
 
-/* Option Button Styles */
-/* Option Button Styles - New Cyber Theme */
+/* Unique Glass Button Design */
 .option-btn {
-  padding: 20px 40px;
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--accent-blue);
-  background: rgba(0, 20, 40, 0.6);
-  border: 1px solid var(--accent-blue);
-  border-radius: 4px; /* More angular for cyber look */
+  padding: 1.2rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  /* Slightly sharp but rounded for modern look */
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: all;
-  box-shadow: 0 0 15px rgba(0, 210, 255, 0.1), inset 0 0 20px rgba(0, 210, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  /* Clip path for tech feel */
-  clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+  pointer-events: all;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Scanline effect */
 .option-btn::after {
   content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    rgba(255, 255, 255, 0) 40%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0) 60%
-  );
-  transform: rotate(45deg) translateY(-100%);
-  transition: transform 0.5s;
-  pointer-events: none;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
+  transition: 0.6s;
 }
 
 .option-btn:hover::after {
@@ -645,43 +631,42 @@ select:focus {
 }
 
 .option-btn:hover {
-  background: rgba(0, 210, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+  transform: translateY(-5px);
+}
+
+#nextSceneBtn {
+  background: rgba(0, 210, 255, 0.1);
+  border: 2px solid var(--accent-blue);
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+  font-weight: 800;
+  color: var(--accent-blue);
+}
+
+#nextSceneBtn:hover {
+  background: rgba(0, 210, 255, 0.2);
+  box-shadow: 0 0 30px rgba(0, 210, 255, 0.6);
   color: #fff;
-  border-color: #fff;
-  box-shadow: 0 0 30px rgba(0, 210, 255, 0.4), inset 0 0 20px rgba(0, 210, 255, 0.2);
-  transform: scale(1.05) translateY(-2px);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
 
-.option-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+/* Transition Overlay */
+.transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
 }
 
-/* Variant for "Risk" or "Aggressive" options - reusing 'negative' class or similar concept if needed */
-.option-btn.negative,
-.option-btn[data-type="risk"] {
-  color: var(--accent-orange);
-  border-color: var(--accent-orange);
-  box-shadow: 0 0 15px rgba(243, 156, 18, 0.1);
-  background: rgba(40, 20, 0, 0.6);
-}
-
-.option-btn.negative:hover {
-  background: rgba(243, 156, 18, 0.15);
-  color: #fff;
-  border-color: #fff;
-  box-shadow: 0 0 30px rgba(243, 156, 18, 0.4);
-}
-
-.option-btn.left {
-  align-self: flex-start;
-  margin-left: 5%; /* Add some spacing from edge */
-}
-
-.option-btn.right {
-  align-self: flex-end;
-  margin-right: 5%; /* Add some spacing from edge */
+.transition-overlay.active {
+  opacity: 1;
 }
 
 /* Loading Indicator */

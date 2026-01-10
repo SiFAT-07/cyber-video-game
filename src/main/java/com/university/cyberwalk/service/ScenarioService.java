@@ -42,6 +42,7 @@ public class ScenarioService {
                 scenario.getAttackerDescription(),
                 scenario.getAttackType() != null ? scenario.getAttackType().name() : null,
                 scenario.isLeafNode(),
+                scenario.getNextScenarioId(),
                 optionDtos);
     }
 
@@ -53,6 +54,7 @@ public class ScenarioService {
                 option.getDefenderScoreDelta(),
                 option.getAttackerScoreDelta(),
                 option.getPosition(),
-                option.getInteractionType());
+                option.getInteractionType(),
+                option.getAppearTime());
     }
 }

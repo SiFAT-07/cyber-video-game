@@ -37,6 +37,8 @@ public class Scenario {
     @Column(nullable = false)
     private boolean isLeafNode = false; // true if this scenario has no further options
 
+    private String nextScenarioId; // The ID of the next scene after this branch/scene ends
+
     @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Option> options;
 }
