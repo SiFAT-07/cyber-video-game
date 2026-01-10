@@ -126,6 +126,15 @@ public class DataInitializer implements CommandLineRunner {
         scenario3.setOptions(Arrays.asList(option3_1, option3_2));
         scenarioRepository.save(scenario3);
 
+        // --- Scenario 4: Group Chat (Phishing) ---
+        Scenario scenario4 = new Scenario();
+        scenario4.setVideoId("4");
+        scenario4.setVideoPath("/video/1.mp4"); // Reusing video 1 for prototype
+        scenario4.setDescription("Group Chat: You get a mysterious link in a group chat.");
+        scenario4.setLeafNode(true);
+        scenario4.setOptions(new ArrayList<>());
+        scenarioRepository.save(scenario4);
+
         System.out.println("Database initialized with scenarios!");
     }
 }

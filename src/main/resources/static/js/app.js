@@ -326,7 +326,7 @@ async function confirmAttack() {
     const response = await fetch(`${API_BASE_URL}/room/${myRoomId}/attack`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ attackType: primaryAttack }),
+      body: JSON.stringify({ roomId: myRoomId, attackType: primaryAttack }),
     });
     const room = await response.json(); // Assuming it returns the updated room state
     updateUI(room); // Update UI based on new room state

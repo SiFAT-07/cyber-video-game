@@ -23,7 +23,6 @@ public class RoomRequests {
 
     @Data
     public static class AttackSelectionRequest {
-        @NotBlank(message = "Room ID is required")
         private String roomId;
 
         @NotNull(message = "Attack Type is required")
@@ -32,7 +31,6 @@ public class RoomRequests {
 
     @Data
     public static class DefenderActionRequest {
-        @NotBlank(message = "Room ID is required")
         private String roomId;
 
         @NotNull(message = "Option ID is required")
