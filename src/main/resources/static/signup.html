@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CyberWalk</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/bg.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        .auth-box {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 16px;
+            width: 400px;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
+            text-align: center;
+        }
+
+        .auth-box h2 {
+            margin-bottom: 2rem;
+            color: #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00ffcc;
+        }
+
+        .btn-auth {
+            width: 100%;
+            margin-top: 1rem;
+            background: linear-gradient(90deg, #00ffcc 0%, #3a7bd5 100%);
+            border: none;
+            padding: 12px;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+        .auth-link {
+            margin-top: 1.5rem;
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .auth-link:hover {
+            color: #00ffcc;
+        }
+
+        .status-msg {
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        .error { color: #ff4b2b; }
+        .success { color: #00ffcc; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h2>Create Profile</h2>
+            
+            <div id="status-msg" class="status-msg"></div>
+
+            <form id="signupForm">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-auth">Register</button>
+            </form>
+
+            <a href="login.html" class="auth-link">Already have an account? Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const statusMsg = document.getElementById('status-msg');
+
+            statusMsg.textContent = '';
+            statusMsg.className = 'status-msg';
+
+            if (password !== confirmPassword) {
+                statusMsg.textContent = "Passwords do not match!";
+                statusMsg.classList.add('error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    statusMsg.textContent = "Registration Successful! Redirecting...";
+                    statusMsg.classList.add('success');
+                    setTimeout(() => window.location.href = 'login.html', 1500);
+                } else {
+                    const errorText = await response.text();
+                    statusMsg.textContent = errorText || "Registration failed.";
+                    statusMsg.classList.add('error');
+                }
+            } catch (err) {
+                console.error(err);
+                statusMsg.textContent = "Network error occurred.";
+                statusMsg.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>
