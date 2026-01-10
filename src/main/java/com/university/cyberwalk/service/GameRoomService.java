@@ -32,12 +32,10 @@ public class GameRoomService {
         room.setAttackerScore(room.getAttackerScore() + option.getAttackerScoreDelta());
         room.setCurrentVideoId(option.getTargetVideoId());
 
-        // Update Video State Logic (if needed) or just let Client handle navigation
-        // based on Option's targetVideoId.
-        // For server-side validation, we could track currentVideoId in Room.
-
-        // Check if game over?
-        if (com.university.cyberwalk.model.Option.SCORE_FAIL == option.getDefenderScoreDelta()) {
+        // Only end game after Scene 4 final choices (4_1 or 4_2)
+        // This ensures all 4 scenes play through completely
+        String targetVideo = option.getTargetVideoId();
+        if ("4_1".equals(targetVideo) || "4_2".equals(targetVideo)) {
             room.setStatus(GameRoom.RoomStatus.ROUND_OVER);
         }
 
@@ -96,25 +94,9 @@ public class GameRoomService {
         room.setSelectedAttackType(attackType);
         room.setStatus(GameRoom.RoomStatus.DEFENDER_TURN);
 
-        // Simple mapping for prototype (In production, use a lookup table)
-        switch (attackType) {
-            case OFFICE_REAL:
-            case OFFICE_FAKE:
-                room.setCurrentVideoId("1"); // Office Scenario Start
-                break;
-            case MFA_REAL:
-            case MFA_FAKE:
-                room.setCurrentVideoId("2"); // Home Scenario Start (Mock)
-                break;
-            case WIFI_ATTACK:
-                room.setCurrentVideoId("3"); // Restaurant Scenario Start (Mock)
-                break;
-            case GROUP_CHAT_LINK:
-                room.setCurrentVideoId("4"); // Group Chat Scenario Start (Mock)
-                break;
-            default:
-                room.setCurrentVideoId("1");
-        }
+        // Always start with Scene 1 for complete story sequence
+        // The full 4-scene sequence will play through automatically
+        room.setCurrentVideoId("1");
 
         return gameRoomRepository.save(room);
     }
@@ -128,6 +110,13 @@ public class GameRoomService {
 
         // Logic to check if round is over can be added here
 
+        return gameRoomRepository.save(room);
+    }
+
+    public GameRoom updateCurrentVideo(String roomId, String videoId) {
+        GameRoom room = gameRoomRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+        room.setCurrentVideoId(videoId);
         return gameRoomRepository.save(room);
     }
 }

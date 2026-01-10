@@ -15,4 +15,5 @@ public class OptionDto {
     private int attackerScoreDelta;
     private String position;
     private String interactionType;
+    private Double appearTime;
 }

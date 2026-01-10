@@ -44,6 +44,8 @@ public class Option {
     @Column(nullable = false)
     private String interactionType; // "click", "hotspot", "drag", "keyboard"
 
+    private Double appearTime; // Seconds from video start when this option appears
+
     @ManyToOne
     @JoinColumn(name = "scenario_id", nullable = false)
     @JsonIgnore

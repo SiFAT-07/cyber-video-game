@@ -16,5 +16,6 @@ public class ScenarioResponse {
     private String attackerDescription;
     private String attackType;
     private boolean isLeafNode;
+    private String nextScenarioId;
     private List<OptionDto> options;
 }

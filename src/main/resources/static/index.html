@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div id="app">
+        <div id="transitionOverlay" class="transition-overlay"></div>
         <!-- Loading Screen -->
         <section id="loading-screen" class="screen active">
             <div class="loader"></div>
-            <p style="letter-spacing: 4px; font-weight: 800; font-size: 0.8rem; color: var(--accent-blue);">INITIALIZING SYSTEM...</p>
+            <p style="letter-spacing: 4px; font-weight: 800; font-size: 0.8rem; color: var(--accent-blue);">INITIALIZING
+                SYSTEM...</p>
         </section>
 
         <!-- New Lobby Screen -->
         <section id="lobby-screen" class="screen">
             <div class="lobby-content" style="position: absolute; bottom: 10%; width: 100%; padding: 0 5%;">
-                <h1 style="font-size: 8rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 2rem; color: var(--accent-blue); text-shadow: 0 0 30px rgba(0, 210, 255, 0.5);">CYBERWALK</h1>
+                <h1
+                    style="font-size: 8rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 2rem; color: var(--accent-blue); text-shadow: 0 0 30px rgba(0, 210, 255, 0.5);">
+                    CYBERWALK</h1>
                 <div class="menu-items" style="display: flex; gap: 20px;">
                     <button class="btn" onclick="startGame()">Play</button>
                     <button class="btn" onclick="showScreen('settings-overlay')">Settings</button>
@@ -34,14 +40,17 @@
         <!-- Settings Overlay -->
         <section id="settings-overlay" class="screen glass">
             <div class="modal-content" style="width: 80%; max-width: 800px; padding: 40px;">
-                <h2 style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-blue); padding-bottom: 1rem;">SETTINGS</h2>
-                
+                <h2
+                    style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-blue); padding-bottom: 1rem;">
+                    SETTINGS</h2>
+
                 <div class="setting-group" style="margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                         <label>GLOBAL VOLUME</label>
                         <span id="volume-val">80%</span>
                     </div>
-                    <input type="range" id="volume-slider" min="0" max="100" value="80" oninput="updateSetting('volume', this.value)">
+                    <input type="range" id="volume-slider" min="0" max="100" value="80"
+                        oninput="updateSetting('volume', this.value)">
                 </div>
 
                 <div class="setting-group" style="margin-bottom: 3rem;">
@@ -49,7 +58,8 @@
                         <label>SCREEN BRIGHTNESS</label>
                         <span id="brightness-val">100%</span>
                     </div>
-                    <input type="range" id="brightness-slider" min="50" max="150" value="100" oninput="updateSetting('brightness', this.value)">
+                    <input type="range" id="brightness-slider" min="50" max="150" value="100"
+                        oninput="updateSetting('brightness', this.value)">
                 </div>
 
                 <button class="btn" onclick="showScreen('lobby-screen')">Back to Lobby</button>
@@ -59,13 +69,18 @@
         <!-- Extras Overlay -->
         <section id="extras-overlay" class="screen glass">
             <div class="modal-content" style="width: 80%; max-width: 800px; padding: 40px; text-align: left;">
-                <h2 style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-orange); padding-bottom: 1rem;">EXTRAS</h2>
+                <h2
+                    style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-orange); padding-bottom: 1rem;">
+                    EXTRAS</h2>
                 <div style="color: var(--text-secondary); line-height: 1.6; font-size: 1.1rem;">
                     <p style="margin-bottom: 1.5rem;"><strong>Version:</strong> 1.0.15681</p>
-                    <p style="margin-bottom: 1.5rem;"><strong>Developer Notes:</strong> DISPATCH is a tactical narrative experience set in a near-future metropolitan area. Experience the life of an emergency responder in a world of high-tech surveillance and complex human stories.</p>
+                    <p style="margin-bottom: 1.5rem;"><strong>Developer Notes:</strong> DISPATCH is a tactical narrative
+                        experience set in a near-future metropolitan area. Experience the life of an emergency responder
+                        in a world of high-tech surveillance and complex human stories.</p>
                     <p>All assets and UI elements are designed to provide a seamless cinematic experience.</p>
                 </div>
-                <button class="btn secondary" style="margin-top: 3rem;" onclick="showScreen('lobby-screen')">Back</button>
+                <button class="btn secondary" style="margin-top: 3rem;"
+                    onclick="showScreen('lobby-screen')">Back</button>
             </div>
         </section>
     </div>
@@ -91,7 +106,8 @@
         </div>
         <div id="lobbyStatus" class="status-msg"></div>
         <!-- Back Button for Navigation -->
-        <button class="btn" onclick="showScreen('lobby-screen'); hideGameComponents();" style="margin-top: 2rem;">Back to Main Menu</button>
+        <button class="btn" onclick="showScreen('lobby-screen'); hideGameComponents();" style="margin-top: 2rem;">Back
+            to Main Menu</button>
     </div>
 
     <!-- Attacker Dashboard -->
@@ -99,13 +115,15 @@
         <div class="dashboard-header">
             <h2>Attacker Control Panel</h2>
             <div class="room-info">Room: <span id="attackerRoomId"></span></div>
-             <div class="score-board">
+            <div class="score-board">
                 Attacker: <span id="attackerScoreValue">0</span> | Defender: <span id="defenderScoreValueAtk">0</span>
             </div>
-            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
-            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
+            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();"
+                style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
+            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();"
+                style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
         </div>
-        
+
         <!-- Scenario Selection (Stage 1) -->
         <div id="scenarioSelectionArea" class="hidden">
             <h3>Select Operation Scenario</h3>
@@ -142,7 +160,8 @@
                 <button class="attack-card" onclick="toggleAttack('WIFI_ATTACK', this)">Fake Wi-Fi</button>
                 <button class="attack-card" onclick="toggleAttack('GROUP_CHAT_LINK', this)">Group Chat Phishing</button>
             </div>
-            <button id="initiateAttackBtn" class="btn btn-primary" onclick="confirmAttack()" disabled style="margin-top: 20px; width: 100%;">INITIATE ATTACK</button>
+            <button id="initiateAttackBtn" class="btn btn-primary" onclick="confirmAttack()" disabled
+                style="margin-top: 20px; width: 100%;">INITIATE ATTACK</button>
         </div>
         <div id="attackerLogArea">
             <h3>Mission Log</h3>
@@ -157,9 +176,10 @@
             <div class="score-label">Defender Score:</div>
             <div id="defenderScoreValue">0</div>
         </div>
-        
+
         <!-- Defender Exit Button -->
-        <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();" style="position: fixed; top: 20px; left: 20px; z-index: 1000; font-size: 0.8rem; padding: 0.5rem 1rem;">
+        <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();"
+            style="position: fixed; top: 20px; left: 20px; z-index: 1000; font-size: 0.8rem; padding: 0.5rem 1rem;">
             Exit
         </button>
 
@@ -180,19 +200,48 @@
                 <div class="loader"></div>
                 <p>Waiting for Attacker...</p>
             </div>
+
+            <!-- Next Scene Button -->
+            <div id="nextSceneContainer" class="hidden"
+                style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 300;">
+                <button id="nextSceneBtn" class="option-btn"
+                    style="padding: 1rem 3rem; font-size: 1.2rem; letter-spacing: 3px;">NEXT SCENE</button>
+            </div>
         </div>
     </div>
 
     <!-- Game Over Screen -->
     <div id="gameOverScreen" class="hidden">
-        <div class="game-over-content">
-            <h1>Round Complete!</h1>
-            <p>Defender Score: <span id="finalDefenderScore">0</span></p>
-            <p>Attacker Score: <span id="finalAttackerScore">0</span></p>
-            <button id="restartButton" class="btn btn-primary">Back to Lobby</button>
+        <div class="game-over-content glass" style="max-width: 600px; width: 90%;">
+            <h1 style="color: var(--accent-blue); margin-bottom: 1rem;">MISSION COMPLETE</h1>
+
+            <div class="final-scores"
+                style="display: flex; justify-content: space-around; margin-bottom: 2rem; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px;">
+                <div class="score-item">
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">DEFENDER</p>
+                    <p id="finalDefenderScore" style="font-size: 2.5rem; font-weight: 800; color: #00ff7f;">0</p>
+                </div>
+                <div class="score-item">
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">ATTACKER</p>
+                    <p id="finalAttackerScore" style="font-size: 2.5rem; font-weight: 800; color: #ff4b2b;">0</p>
+                </div>
+            </div>
+
+            <div id="defenderActionSummary" style="text-align: left; margin-bottom: 2rem;">
+                <h3
+                    style="font-size: 0.9rem; letter-spacing: 2px; color: var(--accent-orange); margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
+                    DEFENSE ANALYSIS</h3>
+                <ul id="actionList"
+                    style="list-style: none; font-size: 0.9rem; color: var(--text-primary); max-height: 200px; overflow-y: auto;">
+                    <!-- Populated via JS -->
+                </ul>
+            </div>
+
+            <button id="restartButton" class="btn primary" style="width: 100%;">RETURN TO MAIN MENU</button>
         </div>
     </div>
 
     <script src="js/app.js"></script>
 </body>
+
 </html>
