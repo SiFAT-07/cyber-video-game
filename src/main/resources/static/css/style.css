@@ -332,8 +332,18 @@ select:focus {
 }
 
 .score-board {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(40, 0, 0, 0.6);
+  border: 1px solid #ff4b2b;
+  padding: 10px 20px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%);
+  box-shadow: 0 0 20px rgba(255, 75, 43, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .score-board span {
@@ -487,36 +497,40 @@ select:focus {
   display: none !important;
 }
 
-/* Score Container */
+/* Score Container - Defender HUD */
 #scoreContainer {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(0, 0, 0, 0.8);
-  border: 2px solid #00ff00;
-  border-radius: 10px;
-  padding: 15px 25px;
+  top: 30px;
+  right: 30px;
+  background: rgba(0, 20, 40, 0.6);
+  border: 1px solid var(--accent-blue);
+  padding: 15px 30px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 15%);
+  box-shadow: 0 0 25px rgba(0, 210, 255, 0.2), inset 0 0 15px rgba(0, 210, 255, 0.1);
 }
 
 .score-label {
-  color: #00ff00;
-  font-size: 14px;
-  font-weight: bold;
+  color: var(--accent-blue);
+  font-size: 12px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   margin-bottom: 5px;
+  opacity: 0.8;
 }
 
-.score-value {
+#defenderScoreValue {
   color: #fff;
   font-size: 32px;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+  font-weight: 900;
+  text-shadow: 0 0 15px rgba(0, 210, 255, 0.8);
+  font-family: "Courier New", Courier, monospace;
 }
 
 /* Video Container */
@@ -539,7 +553,7 @@ select:focus {
 /* Options Overlay */
 #optionsOverlay {
   position: absolute;
-  bottom: 0;
+  bottom: 15%; /* Lifted up as requested */
   left: 0;
   right: 0;
   padding: 30px;
@@ -584,7 +598,8 @@ select:focus {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-.option-btn::before {
+/* Scanline effect */
+.option-btn::after {
   content: "";
   position: absolute;
   top: 0;
@@ -598,8 +613,21 @@ select:focus {
   transition: 0.6s;
 }
 
-.option-btn:hover::before {
-  left: 100%;
+.option-btn:hover::after {
+  transform: rotate(45deg) translateY(100%);
+}
+
+.option-btn::before {
+  /* Tech border accents */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 0 1px rgba(0, 210, 255, 0.3);
+  z-index: -1;
+  opacity: 0.5;
 }
 
 .option-btn:hover {
