@@ -3,6 +3,7 @@ package com.university.cyberwalk.controller;
 import com.university.cyberwalk.dto.RoomRequests;
 import com.university.cyberwalk.model.GameRoom;
 import com.university.cyberwalk.service.GameRoomService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class GameRoomController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<GameRoom> joinRoom(@RequestBody RoomRequests.JoinRoomRequest request) {
+    public ResponseEntity<GameRoom> joinRoom(@Valid @RequestBody RoomRequests.JoinRoomRequest request) {
         return ResponseEntity.ok(gameRoomService.joinRoom(request.getRoomId(), request.getRole()));
     }
 
@@ -32,13 +33,13 @@ public class GameRoomController {
 
     @PostMapping("/{roomId}/attack")
     public ResponseEntity<GameRoom> selectAttack(@PathVariable String roomId,
-            @RequestBody RoomRequests.AttackSelectionRequest request) {
+            @Valid @RequestBody RoomRequests.AttackSelectionRequest request) {
         return ResponseEntity.ok(gameRoomService.setAttack(roomId, request.getAttackType()));
     }
 
     @PostMapping("/{roomId}/action")
     public ResponseEntity<GameRoom> defenderAction(@PathVariable String roomId,
-            @RequestBody RoomRequests.DefenderActionRequest request) {
+            @Valid @RequestBody RoomRequests.DefenderActionRequest request) {
         return ResponseEntity.ok(gameRoomService.processAction(roomId, request.getOptionId()));
     }
 }
