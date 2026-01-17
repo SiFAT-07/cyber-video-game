@@ -29,6 +29,7 @@
                     CYBERWALK</h1>
                 <div class="menu-items" style="display: flex; gap: 20px;">
                     <button class="btn" onclick="startGame()">Play</button>
+                    <button class="btn" onclick="window.location.href='editor.html'">Level Editor</button>
                     <button class="btn" onclick="showScreen('settings-overlay')">Settings</button>
                     <button class="btn secondary" onclick="showScreen('extras-overlay')">Extras</button>
                     <button class="btn" onclick="window.location.href='/logout'">Logout</button>
@@ -110,102 +111,183 @@
             to Main Menu</button>
     </div>
 
-    <!-- Attacker Dashboard -->
-    <div id="attackerDashboard" class="hidden">
-        <div class="dashboard-header">
-            <h2>Attacker Control Panel</h2>
-            <div class="room-info">Room: <span id="attackerRoomId"></span></div>
-            <div class="score-board">
-                Attacker: <span id="attackerScoreValue">0</span> | Defender: <span id="defenderScoreValueAtk">0</span>
+    <!-- NEW: Attacker Game Interface -->
+    <div id="attackerGameArea" class="hidden game-area">
+        <div class="game-header attacker-header">
+            <div class="header-left">
+                <span class="role-badge attacker">⚔️ ATTACKER</span>
+                <span class="room-id">Room: <span id="atkRoomId"></span></span>
             </div>
-            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();"
-                style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
-            <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();"
-                style="font-size: 0.8rem; padding: 0.5rem 1rem;">Exit</button>
-        </div>
-
-        <!-- Scenario Selection (Stage 1) -->
-        <div id="scenarioSelectionArea" class="hidden">
-            <h3>Select Operation Scenario</h3>
-            <div class="scenario-cards">
-                <div class="scenario-card" onclick="selectScenario(1)">
-                    <h4>Scenario 1: Corporate Espionage</h4>
-                    <p>Target: FinEdge Global</p>
-                    <span class="status active">ACTIVE</span>
+            <div class="header-center">
+                <div class="round-info">Round <span id="atkRoundNum">1</span> / <span id="atkMaxRounds">3</span></div>
+            </div>
+            <div class="header-right">
+                <div class="scores">
+                    <span class="score attacker-score">🔴 <span id="atkScore">0</span></span>
+                    <span class="score defender-score">🔵 <span id="atkDefScore">0</span></span>
                 </div>
-                <div class="scenario-card disabled">
-                    <h4>Scenario 2: Infrastructure</h4>
-                    <p>Locked</p>
-                    <span class="status">LOCKED</span>
-                </div>
-                <div class="scenario-card disabled">
-                    <h4>Scenario 3: Supply Chain</h4>
-                    <p>Locked</p>
-                    <span class="status">LOCKED</span>
-                </div>
-                <div class="scenario-card disabled">
-                    <h4>Scenario 4: Ransomware</h4>
-                    <p>Locked</p>
-                    <span class="status">LOCKED</span>
-                </div>
+                <button class="btn btn-small exit-btn" onclick="exitToLobby()">Exit</button>
             </div>
         </div>
 
-        <!-- Attack Selection (Stage 2) -->
-        <div id="attackSelectionArea" class="hidden">
-            <h3>Select Attack Vectors (Select 2 to Start)</h3>
-            <div class="attack-cards">
-                <button class="attack-card" onclick="toggleAttack('OFFICE_FAKE', this)">Deepfake Call</button>
-                <button class="attack-card" onclick="toggleAttack('MFA_FAKE', this)">MFA Fatigue</button>
-                <button class="attack-card" onclick="toggleAttack('WIFI_ATTACK', this)">Fake Wi-Fi</button>
-                <button class="attack-card" onclick="toggleAttack('GROUP_CHAT_LINK', this)">Group Chat Phishing</button>
+        <div class="game-content">
+            <!-- Phase: Level Selection -->
+            <div id="atkLevelSelect" class="game-phase">
+                <h2 class="phase-title">Select Target Environment</h2>
+                <div id="levelCards" class="selection-grid">
+                    <!-- Loaded dynamically -->
+                </div>
             </div>
-            <button id="initiateAttackBtn" class="btn btn-primary" onclick="confirmAttack()" disabled
-                style="margin-top: 20px; width: 100%;">INITIATE ATTACK</button>
-        </div>
-        <div id="attackerLogArea">
-            <h3>Mission Log</h3>
-            <ul id="missionLog"></ul>
+
+            <!-- Phase: Target Profile Info -->
+            <div id="atkProfileInfo" class="game-phase hidden">
+                <h2 class="phase-title">Target Profile</h2>
+                <div class="profile-display">
+                    <div class="profile-avatar" id="targetAvatar">👤</div>
+                    <div class="profile-details">
+                        <h3 id="targetName">Loading...</h3>
+                        <p id="targetDescription"></p>
+                        <div class="profile-stats">
+                            <div class="stat"><span class="stat-label">Age:</span> <span id="targetAge">-</span></div>
+                            <div class="stat"><span class="stat-label">Occupation:</span> <span id="targetOccupation">-</span></div>
+                            <div class="stat"><span class="stat-label">Tech Level:</span> <span id="targetTechLevel">-</span></div>
+                            <div class="stat"><span class="stat-label">Mental State:</span> <span id="targetMentalState">-</span></div>
+                        </div>
+                        <div class="profile-tags">
+                            <h4>Relationships (Can Impersonate):</h4>
+                            <div id="targetRelationships" class="tags"></div>
+                        </div>
+                        <div class="profile-tags">
+                            <h4>Vulnerabilities:</h4>
+                            <div id="targetVulnerabilities" class="tags vulnerability-tags"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="proceedToAttackTypes()">Continue to Attack Selection →</button>
+            </div>
+
+            <!-- Phase: Attack Type Selection -->
+            <div id="atkTypeSelect" class="game-phase hidden">
+                <h2 class="phase-title">Choose Attack Vector</h2>
+                <p class="phase-description">Select how you want to attack the target</p>
+                <div id="attackTypeCards" class="selection-grid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Phase: Attack Option Selection -->
+            <div id="atkOptionSelect" class="game-phase hidden">
+                <h2 class="phase-title">Configure Your Attack</h2>
+                <p class="phase-description">Choose your specific approach</p>
+                <div id="attackOptionCards" class="selection-grid options-grid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Phase: Waiting for Defender -->
+            <div id="atkWaiting" class="game-phase hidden">
+                <div class="waiting-display">
+                    <div class="spinner"></div>
+                    <h2>Attack Launched!</h2>
+                    <p id="attackLaunchedMsg">Waiting for defender to respond...</p>
+                    <div class="attack-preview">
+                        <div class="preview-label">Your Attack:</div>
+                        <div id="attackPreviewContent" class="preview-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase: Outcome Display -->
+            <div id="atkOutcome" class="game-phase hidden">
+                <div class="outcome-display">
+                    <h2>Round Result</h2>
+                    <div id="outcomeMessage" class="outcome-message"></div>
+                    <div class="score-change">
+                        <div class="score-delta attacker"><span id="atkScoreDelta">+0</span></div>
+                        <div class="score-delta defender"><span id="defScoreDelta">+0</span></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="nextRound()">Continue</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Defender Game Area -->
-    <div id="defenderGameArea" class="hidden">
-        <!-- Score Display -->
-        <div id="scoreContainer">
-            <div class="score-label">Defender Score:</div>
-            <div id="defenderScoreValue">0</div>
+    <!-- NEW: Defender Game Interface -->
+    <div id="defenderGameArea" class="hidden game-area">
+        <div class="game-header defender-header">
+            <div class="header-left">
+                <span class="role-badge defender">🛡️ DEFENDER</span>
+                <span class="room-id">Room: <span id="defRoomId"></span></span>
+            </div>
+            <div class="header-center">
+                <div class="round-info">Round <span id="defRoundNum">1</span> / <span id="defMaxRounds">3</span></div>
+            </div>
+            <div class="header-right">
+                <div class="scores">
+                    <span class="score defender-score">🔵 <span id="defScore">0</span></span>
+                    <span class="score attacker-score">🔴 <span id="defAtkScore">0</span></span>
+                </div>
+                <button class="btn btn-small exit-btn" onclick="exitToLobby()">Exit</button>
+            </div>
         </div>
 
-        <!-- Defender Exit Button -->
-        <button class="btn btn-secondary" onclick="showScreen('lobby-screen'); hideGameComponents();"
-            style="position: fixed; top: 20px; left: 20px; z-index: 1000; font-size: 0.8rem; padding: 0.5rem 1rem;">
-            Exit
-        </button>
-
-        <!-- Video Container -->
-        <div id="videoContainer">
-            <video id="mainVideo" controls>
-                <source src="" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-
-            <!-- Options Overlay (Hidden by default) -->
-            <div id="optionsOverlay" class="hidden">
-                <div id="optionButtons"></div>
+        <div class="game-content">
+            <!-- Phase: Waiting for Attacker -->
+            <div id="defWaiting" class="game-phase">
+                <div class="waiting-display">
+                    <div class="spinner"></div>
+                    <h2>Standing By...</h2>
+                    <p>Waiting for attacker to launch their attack</p>
+                    <div class="defender-tips">
+                        <h4>🔒 Security Tips While You Wait:</h4>
+                        <ul>
+                            <li>Never share passwords or OTPs with anyone</li>
+                            <li>Verify caller identity through official channels</li>
+                            <li>Check URLs carefully before clicking</li>
+                            <li>When in doubt, hang up and call back</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
-            <!-- Loading Indicator -->
-            <div id="loadingIndicator" class="hidden">
-                <div class="loader"></div>
-                <p>Waiting for Attacker...</p>
+            <!-- Phase: Under Attack - Response Required -->
+            <div id="defUnderAttack" class="game-phase hidden">
+                <div class="attack-notification">
+                    <div class="alert-icon">⚠️</div>
+                    <h2>Incoming Communication!</h2>
+                </div>
+                
+                <div class="attack-content">
+                    <div class="sender-info">
+                        <span class="sender-label">From:</span>
+                        <span id="attackSender" class="sender-name">Unknown</span>
+                    </div>
+                    <div class="message-box">
+                        <p id="attackMessage">Loading message...</p>
+                    </div>
+                </div>
+
+                <div class="response-section">
+                    <h3>How do you respond?</h3>
+                    <div id="defenderChoices" class="choices-grid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
             </div>
 
-            <!-- Next Scene Button -->
-            <div id="nextSceneContainer" class="hidden"
-                style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 300;">
-                <button id="nextSceneBtn" class="option-btn"
-                    style="padding: 1rem 3rem; font-size: 1.2rem; letter-spacing: 3px;">NEXT SCENE</button>
+            <!-- Phase: Outcome Display -->
+            <div id="defOutcome" class="game-phase hidden">
+                <div class="outcome-display">
+                    <h2 id="defOutcomeTitle">Result</h2>
+                    <div id="defOutcomeMessage" class="outcome-message"></div>
+                    <div class="educational-note" id="educationalNote">
+                        <!-- Educational content -->
+                    </div>
+                    <div class="score-change">
+                        <div class="score-delta defender"><span id="defScoreChange">+0</span></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="defenderContinue()">Continue</button>
+                </div>
             </div>
         </div>
     </div>
@@ -213,7 +295,8 @@
     <!-- Game Over Screen -->
     <div id="gameOverScreen" class="hidden">
         <div class="game-over-content glass" style="max-width: 600px; width: 90%;">
-            <h1 style="color: var(--accent-blue); margin-bottom: 1rem;">MISSION COMPLETE</h1>
+            <h1 id="gameOverTitle" style="color: var(--accent-blue); margin-bottom: 1rem;">GAME OVER</h1>
+            <p id="gameOverSubtitle" style="color: var(--text-secondary); margin-bottom: 2rem;"></p>
 
             <div class="final-scores"
                 style="display: flex; justify-content: space-around; margin-bottom: 2rem; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px;">
@@ -227,21 +310,21 @@
                 </div>
             </div>
 
-            <div id="defenderActionSummary" style="text-align: left; margin-bottom: 2rem;">
+            <div id="gameAnalysis" style="text-align: left; margin-bottom: 2rem;">
                 <h3
                     style="font-size: 0.9rem; letter-spacing: 2px; color: var(--accent-orange); margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
-                    DEFENSE ANALYSIS</h3>
-                <ul id="actionList"
-                    style="list-style: none; font-size: 0.9rem; color: var(--text-primary); max-height: 200px; overflow-y: auto;">
+                    SECURITY LESSONS</h3>
+                <div id="lessonsLearned" style="color: var(--text-secondary); font-size: 0.9rem;">
                     <!-- Populated via JS -->
-                </ul>
+                </div>
             </div>
 
-            <button id="restartButton" class="btn primary" style="width: 100%;">RETURN TO MAIN MENU</button>
+            <button id="restartButton" class="btn primary" style="width: 100%;" onclick="exitToLobby()">RETURN TO MAIN MENU</button>
         </div>
     </div>
 
     <script src="js/app.js"></script>
+    <script src="js/game.js"></script>
 </body>
 
 </html>

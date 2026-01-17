@@ -17,7 +17,8 @@ const app = document.getElementById("app");
 
 // DOM Elements - Game
 const roomSelectionScreen = document.getElementById("roomSelectionScreen"); // Renamed from lobbyScreen
-const attackerDashboard = document.getElementById("attackerDashboard");
+const attackerDashboard = document.getElementById("attackerDashboard"); // Legacy - may not exist
+const attackerGameArea = document.getElementById("attackerGameArea"); // New game area
 const defenderGameArea = document.getElementById("defenderGameArea");
 const lobbyStatus = document.getElementById("lobbyStatus");
 const videoElement = document.getElementById("mainVideo");
@@ -85,10 +86,12 @@ function updateSetting(type, value) {
 }
 
 function hideGameComponents() {
-  roomSelectionScreen.classList.add("hidden");
-  attackerDashboard.classList.add("hidden");
-  defenderGameArea.classList.add("hidden");
-  document.getElementById("gameOverScreen").classList.add("hidden");
+  if (roomSelectionScreen) roomSelectionScreen.classList.add("hidden");
+  if (attackerDashboard) attackerDashboard.classList.add("hidden");
+  if (attackerGameArea) attackerGameArea.classList.add("hidden");
+  if (defenderGameArea) defenderGameArea.classList.add("hidden");
+  const gameOverScreen = document.getElementById("gameOverScreen");
+  if (gameOverScreen) gameOverScreen.classList.add("hidden");
   if (pollInterval) clearInterval(pollInterval);
 }
 
@@ -141,15 +144,21 @@ async function joinRoom() {
 function enterGameMode() {
   roomSelectionScreen.classList.add("hidden");
 
-  if (myRole === "ATTACKER") {
-    attackerDashboard.classList.remove("hidden");
-    document.getElementById("attackerRoomId").textContent = myRoomId;
+  // Use the new game system
+  if (typeof initGame === "function") {
+    initGame(myRoomId, myRole);
   } else {
-    defenderGameArea.classList.remove("hidden");
-  }
+    // Fallback to old system (for backwards compatibility)
+    if (myRole === "ATTACKER") {
+      attackerDashboard.classList.remove("hidden");
+      document.getElementById("attackerRoomId").textContent = myRoomId;
+    } else {
+      defenderGameArea.classList.remove("hidden");
+    }
 
-  // Start Polling
-  pollInterval = setInterval(pollGameState, 1500);
+    // Start Polling
+    pollInterval = setInterval(pollGameState, 1500);
+  }
 }
 
 // --- Game Logic ---
@@ -437,27 +446,36 @@ async function loadScenarioForDefender(videoId) {
     videoElement.onended = () => {
       console.log("Video playback finished.");
 
-      const isLeaf = (scenario.leafNode === true || scenario.isLeafNode === true);
+      const isLeaf = scenario.leafNode === true || scenario.isLeafNode === true;
       const nextSceneId = scenario.nextScenarioId;
 
       console.log("Scenario Data:", {
         videoId: videoId,
         isLeaf: isLeaf,
-        nextSceneId: nextSceneId
+        nextSceneId: nextSceneId,
       });
 
       if (isLeaf) {
         if (nextSceneId) {
-          console.log("Leaf node detected with next scene. Showing 'Next Scene' button.");
+          console.log(
+            "Leaf node detected with next scene. Showing 'Next Scene' button."
+          );
           showNextSceneButton(nextSceneId);
         } else {
-          console.log("Final leaf node reached. Transitioning to game over soon.");
+          console.log(
+            "Final leaf node reached. Transitioning to game over soon."
+          );
         }
       } else {
         // Not a leaf node (this was a main scene video)
         // If choices weren't shown (e.g. video was too short), show them now
-        if (optionsOverlay.classList.contains("hidden") && currentScenarioOptions.length > 0) {
-          console.log("Main video ended without choices showing. Triggering fallback.");
+        if (
+          optionsOverlay.classList.contains("hidden") &&
+          currentScenarioOptions.length > 0
+        ) {
+          console.log(
+            "Main video ended without choices showing. Triggering fallback."
+          );
           showOptions(currentScenarioOptions);
         } else {
           console.log("Main video ended. Choices should already be visible.");
@@ -498,9 +516,12 @@ async function sendDefenderAction(optionId) {
     const room = await response.json();
 
     // Find the option that was selected
-    const opt = currentScenarioOptions.find(o => o.id === optionId);
+    const opt = currentScenarioOptions.find((o) => o.id === optionId);
     if (opt) {
-      const scoreTag = opt.defenderScoreDelta >= 0 ? `+${opt.defenderScoreDelta}` : opt.defenderScoreDelta;
+      const scoreTag =
+        opt.defenderScoreDelta >= 0
+          ? `+${opt.defenderScoreDelta}`
+          : opt.defenderScoreDelta;
       addToLog(`Defender Choice: ${opt.label} (${scoreTag})`);
 
       // Load the branch video directly with transition
@@ -517,17 +538,21 @@ async function sendDefenderAction(optionId) {
 
 function showGameOver(room) {
   document.getElementById("gameOverScreen").classList.remove("hidden");
-  document.getElementById("finalDefenderScore").textContent = room.defenderScore;
-  document.getElementById("finalAttackerScore").textContent = room.attackerScore;
+  document.getElementById("finalDefenderScore").textContent =
+    room.defenderScore;
+  document.getElementById("finalAttackerScore").textContent =
+    room.attackerScore;
 
   // Populate Analysis
   const actionList = document.getElementById("actionList");
   actionList.innerHTML = "";
 
   const missionLog = document.getElementById("missionLog");
-  const entries = Array.from(missionLog.querySelectorAll("li")).map(li => li.innerText);
+  const entries = Array.from(missionLog.querySelectorAll("li")).map(
+    (li) => li.innerText
+  );
 
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     if (entry.includes("Defender Choice")) {
       const li = document.createElement("li");
       li.style.marginBottom = "8px";
@@ -539,7 +564,8 @@ function showGameOver(room) {
   });
 
   if (actionList.innerHTML === "") {
-    actionList.innerHTML = "<li style='color: var(--text-secondary);'>No activity recorded.</li>";
+    actionList.innerHTML =
+      "<li style='color: var(--text-secondary);'>No activity recorded.</li>";
   }
 }
 
@@ -586,12 +612,12 @@ function showNextSceneButton(nextScenarioId) {
       fetch(`${API_BASE_URL}/room/${myRoomId}/video/${nextScenarioId}`, {
         method: "PUT",
       })
-        .then(res => res.json())
-        .then(room => {
+        .then((res) => res.json())
+        .then((room) => {
           lastKnownState = room; // Sync state to prevent polling conflict
           triggerTransition(() => loadScenarioForDefender(nextScenarioId));
         })
-        .catch(e => {
+        .catch((e) => {
           console.error("Sync failed, proceeding anyway", e);
           triggerTransition(() => loadScenarioForDefender(nextScenarioId));
         });
