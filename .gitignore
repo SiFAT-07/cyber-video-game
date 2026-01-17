@@ -45,3 +45,8 @@ mvnw.cmd
 
 ### Database ###
 *.db
+
+### H2 Database Files ###
+### /data/ ### 
+### *.mv.db ###  
+### *.trace.db ### 

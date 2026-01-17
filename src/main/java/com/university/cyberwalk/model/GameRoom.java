@@ -57,6 +57,10 @@ public class GameRoom {
     @Column(length = 2000)
     private String lastOutcome;
 
+    // Last score deltas for display
+    private Integer lastDefenderScoreDelta = 0;
+    private Integer lastAttackerScoreDelta = 0;
+
     public enum RoomStatus {
         WAITING, // Waiting for 2nd player
         ATTACK_SELECTION, // Attacker choosing attack (legacy)

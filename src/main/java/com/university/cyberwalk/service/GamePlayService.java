@@ -105,6 +105,10 @@ public class GamePlayService {
         room.setDefenderScore(room.getDefenderScore() + choice.getDefenderScoreDelta());
         room.setAttackerScore(room.getAttackerScore() + choice.getAttackerScoreDelta());
 
+        // Store last score deltas for display
+        room.setLastDefenderScoreDelta(choice.getDefenderScoreDelta());
+        room.setLastAttackerScoreDelta(choice.getAttackerScoreDelta());
+
         // Set outcome message
         room.setLastOutcome(choice.getOutcome());
         room.setLastActionMessage("Defender chose: " + choice.getLabel());

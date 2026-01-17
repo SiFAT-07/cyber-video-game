@@ -50,7 +50,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  transition: opacity var(--transition-speed) ease,
+  transition:
+    opacity var(--transition-speed) ease,
     visibility var(--transition-speed);
   opacity: 0;
   visibility: hidden;
@@ -75,7 +76,8 @@ body {
 /* New Lobby Specifics */
 #lobby-screen {
   /* Using the new high-res cyberpunk background */
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
     url("../img/bg.png");
   background-size: cover;
   background-position: center;
@@ -514,7 +516,8 @@ select:focus {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 15%);
-  box-shadow: 0 0 25px rgba(0, 210, 255, 0.2),
+  box-shadow:
+    0 0 25px rgba(0, 210, 255, 0.2),
     inset 0 0 15px rgba(0, 210, 255, 0.1);
 }
 
@@ -1292,6 +1295,14 @@ select:focus {
 
 .score-delta.defender {
   color: #64c8ff;
+}
+
+.score-delta.positive {
+  color: #4ade80; /* Green for positive scores */
+}
+
+.score-delta.negative {
+  color: #f87171; /* Red for negative scores */
 }
 
 .educational-note {

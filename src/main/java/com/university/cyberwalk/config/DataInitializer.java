@@ -18,8 +18,13 @@ public class DataInitializer implements CommandLineRunner {
 
         @Override
         public void run(String... args) throws Exception {
-                // Clear existing data to ensure a fresh start
-                scenarioRepository.deleteAll();
+                // Only initialize data if database is empty (first run)
+                if (scenarioRepository.count() > 0) {
+                        System.out.println("Database already contains data. Skipping initialization.");
+                        return;
+                }
+
+                System.out.println("Initializing database with default scenarios...");
 
                 // --- SCENE 1: IT SPAM MAIL ---
                 Scenario s1 = new Scenario();

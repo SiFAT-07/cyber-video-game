@@ -419,10 +419,17 @@ async function deleteDefenderProfile(id) {
   if (!confirm("Delete this defender profile?")) return;
 
   try {
-    await fetch(`${API_BASE}/defender-profiles/${id}`, { method: "DELETE" });
-    selectLevel(currentLevelId);
+    const response = await fetch(`${API_BASE}/defender-profiles/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Delete failed:", errorText);
+      alert(`Failed to delete defender profile: ${errorText}`);
+      return;
+    }
+    await selectLevel(currentLevelId);
   } catch (error) {
     console.error("Error deleting profile:", error);
+    alert(`Error deleting defender profile: ${error.message}`);
   }
 }
 
@@ -763,10 +770,17 @@ async function deleteAttackScenario(id) {
   if (!confirm("Delete this attack scenario and all its options?")) return;
 
   try {
-    await fetch(`${API_BASE}/attack-scenarios/${id}`, { method: "DELETE" });
-    selectLevel(currentLevelId);
+    const response = await fetch(`${API_BASE}/attack-scenarios/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Delete failed:", errorText);
+      alert(`Failed to delete scenario: ${errorText}`);
+      return;
+    }
+    await selectLevel(currentLevelId);
   } catch (error) {
     console.error("Error deleting scenario:", error);
+    alert(`Error deleting scenario: ${error.message}`);
   }
 }
 
@@ -854,10 +868,17 @@ async function deleteAttackOption(id) {
   if (!confirm("Delete this attack option and all its choices?")) return;
 
   try {
-    await fetch(`${API_BASE}/attack-options/${id}`, { method: "DELETE" });
-    selectLevel(currentLevelId);
+    const response = await fetch(`${API_BASE}/attack-options/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Delete failed:", errorText);
+      alert(`Failed to delete attack option: ${errorText}`);
+      return;
+    }
+    await selectLevel(currentLevelId);
   } catch (error) {
     console.error("Error deleting option:", error);
+    alert(`Error deleting attack option: ${error.message}`);
   }
 }
 
@@ -987,10 +1008,17 @@ async function deleteDefenderChoice(id) {
   if (!confirm("Delete this defender choice?")) return;
 
   try {
-    await fetch(`${API_BASE}/defender-choices/${id}`, { method: "DELETE" });
-    selectLevel(currentLevelId);
+    const response = await fetch(`${API_BASE}/defender-choices/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Delete failed:", errorText);
+      alert(`Failed to delete defender choice: ${errorText}`);
+      return;
+    }
+    await selectLevel(currentLevelId);
   } catch (error) {
     console.error("Error deleting choice:", error);
+    alert(`Error deleting defender choice: ${error.message}`);
   }
 }
 

@@ -100,6 +100,23 @@ function updateScores(state) {
   if (defAtkScore) defAtkScore.textContent = state.attackerScore;
 }
 
+function updateScoreDeltas(state) {
+  const atkScoreDelta = document.getElementById("atkScoreDelta");
+  const defScoreDelta = document.getElementById("defScoreDelta");
+
+  if (atkScoreDelta && state.lastAttackerScoreDelta !== undefined) {
+    const atkDelta = state.lastAttackerScoreDelta;
+    atkScoreDelta.textContent = atkDelta >= 0 ? `+${atkDelta}` : `${atkDelta}`;
+    atkScoreDelta.parentElement.className = `score-delta attacker ${atkDelta >= 0 ? "positive" : "negative"}`;
+  }
+
+  if (defScoreDelta && state.lastDefenderScoreDelta !== undefined) {
+    const defDelta = state.lastDefenderScoreDelta;
+    defScoreDelta.textContent = defDelta >= 0 ? `+${defDelta}` : `${defDelta}`;
+    defScoreDelta.parentElement.className = `score-delta defender ${defDelta >= 0 ? "positive" : "negative"}`;
+  }
+}
+
 function updateRoundInfo(state) {
   const elements = ["atkRoundNum", "defRoundNum"];
   elements.forEach((id) => {
@@ -150,6 +167,8 @@ function updateAttackerUI(state) {
       document.getElementById("atkOutcome").classList.remove("hidden");
       document.getElementById("outcomeMessage").textContent =
         state.lastOutcome || "Round completed";
+      // Update score deltas
+      updateScoreDeltas(state);
       break;
   }
 }
@@ -203,7 +222,7 @@ function renderLevelCards() {
                 <span class="badge">${level.difficulty}</span>
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 }
@@ -214,14 +233,14 @@ async function selectLevel(levelId) {
 
     // Load profiles for this level
     const profilesResponse = await fetch(
-      `${GAME_API}/levels/${levelId}/profiles`
+      `${GAME_API}/levels/${levelId}/profiles`,
     );
     gameState.profiles = await profilesResponse.json();
     console.log("Loaded profiles:", gameState.profiles);
 
     // Load attack scenarios for this level
     const scenariosResponse = await fetch(
-      `${GAME_API}/levels/${levelId}/attack-scenarios`
+      `${GAME_API}/levels/${levelId}/attack-scenarios`,
     );
     gameState.scenarios = await scenariosResponse.json();
     console.log("Loaded attack scenarios:", gameState.scenarios);
@@ -291,7 +310,7 @@ function renderAttackTypeCards() {
   const container = document.getElementById("attackTypeCards");
   console.log(
     "Rendering attack type cards. Scenarios count:",
-    gameState.scenarios.length
+    gameState.scenarios.length,
   );
   console.log("Container element:", container);
 
@@ -324,7 +343,7 @@ function renderAttackTypeCards() {
                 }</span>
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 
@@ -339,7 +358,7 @@ async function selectAttackScenario(scenarioId) {
 
     // Load attack options
     const response = await fetch(
-      `${GAME_API}/attack-scenarios/${scenarioId}/options`
+      `${GAME_API}/attack-scenarios/${scenarioId}/options`,
     );
     gameState.options = await response.json();
 
@@ -404,7 +423,7 @@ function renderAttackOptionCards() {
                 }
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 
@@ -445,7 +464,7 @@ async function nextRound() {
     // Reload scenarios for next round
     if (gameState.currentLevelId) {
       const scenariosResponse = await fetch(
-        `${GAME_API}/levels/${gameState.currentLevelId}/attack-scenarios`
+        `${GAME_API}/levels/${gameState.currentLevelId}/attack-scenarios`,
       );
       gameState.scenarios = await scenariosResponse.json();
     }
@@ -505,7 +524,7 @@ async function loadDefenderChoices() {
         gameState.currentOptionId = room.currentAttackOptionId;
 
         const choicesResponse = await fetch(
-          `${GAME_API}/attack-options/${room.currentAttackOptionId}/choices`
+          `${GAME_API}/attack-options/${room.currentAttackOptionId}/choices`,
         );
         gameState.choices = await choicesResponse.json();
         renderDefenderChoices();
@@ -532,7 +551,7 @@ async function loadDefenderChoices() {
   } else {
     try {
       const response = await fetch(
-        `${GAME_API}/attack-options/${gameState.currentOptionId}/choices`
+        `${GAME_API}/attack-options/${gameState.currentOptionId}/choices`,
       );
       gameState.choices = await response.json();
       renderDefenderChoices();
@@ -564,7 +583,7 @@ function renderDefenderChoices() {
 
   // Check if we're in a follow-up situation (tree depth > 0)
   const hasTreeDepth = gameState.choices.some(
-    (c) => c.treeDepth && c.treeDepth > 0
+    (c) => c.treeDepth && c.treeDepth > 0,
   );
   const treeDepth = hasTreeDepth ? gameState.choices[0].treeDepth : 0;
 
@@ -594,7 +613,7 @@ function renderDefenderChoices() {
                 : ""
             }
         </div>
-    `
+    `,
       )
       .join("");
 }
