@@ -68,7 +68,7 @@ function setupTagInputs() {
           renderTags(
             "vulnerabilityTags",
             profileVulnerabilities,
-            "vulnerability"
+            "vulnerability",
           );
           e.target.value = "";
         }
@@ -85,7 +85,7 @@ function renderTags(containerId, tags, type) {
             ${tag}
             <span class="remove-tag" onclick="removeTag('${type}', ${index})">&times;</span>
         </span>
-    `
+    `,
     )
     .join("");
 }
@@ -135,7 +135,7 @@ function renderLevelList(levels) {
                 <span class="badge">${level.difficulty}</span>
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 }
@@ -153,7 +153,7 @@ async function selectLevel(id) {
 
     // Find and highlight the selected level item
     const selectedItem = document.querySelector(
-      `.level-item[data-level-id="${id}"]`
+      `.level-item[data-level-id="${id}"]`,
     );
     if (selectedItem) {
       selectedItem.classList.add("active");
@@ -251,7 +251,7 @@ async function deleteCurrentLevel() {
 
   if (
     !confirm(
-      "Are you sure you want to delete this level? This will delete all profiles, scenarios, and choices within it."
+      "Are you sure you want to delete this level? This will delete all profiles, scenarios, and choices within it.",
     )
   ) {
     return;
@@ -317,7 +317,7 @@ function renderDefenderProfiles(profiles) {
                   .join("")}
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 }
@@ -403,7 +403,7 @@ async function saveDefenderProfile(e) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(profileData),
-        }
+        },
       );
     }
 
@@ -419,7 +419,9 @@ async function deleteDefenderProfile(id) {
   if (!confirm("Delete this defender profile?")) return;
 
   try {
-    const response = await fetch(`${API_BASE}/defender-profiles/${id}`, { method: "DELETE" });
+    const response = await fetch(`${API_BASE}/defender-profiles/${id}`, {
+      method: "DELETE",
+    });
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Delete failed:", errorText);
@@ -485,12 +487,12 @@ function renderAttackScenarios(scenarios) {
                     </h5>
                     ${renderAttackOptions(
                       scenario.attackOptions || [],
-                      scenario.id
+                      scenario.id,
                     )}
                 </div>
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 }
@@ -549,12 +551,12 @@ function renderAttackOptions(options, scenarioId) {
                     </h6>
                     ${renderDefenderChoices(
                       option.defenderChoices || [],
-                      option.id
+                      option.id,
                     )}
                 </div>
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 }
@@ -601,7 +603,7 @@ function renderDefenderChoices(choices, optionId, depth = 0) {
   return choices
     .map((choice) => {
       const followUpAttack = findAttackOptionById(
-        choice.followUpAttackOptionId
+        choice.followUpAttackOptionId,
       );
       const hasFollowUp = choice.followUpAttackOptionId && followUpAttack;
 
@@ -770,7 +772,9 @@ async function deleteAttackScenario(id) {
   if (!confirm("Delete this attack scenario and all its options?")) return;
 
   try {
-    const response = await fetch(`${API_BASE}/attack-scenarios/${id}`, { method: "DELETE" });
+    const response = await fetch(`${API_BASE}/attack-scenarios/${id}`, {
+      method: "DELETE",
+    });
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Delete failed:", errorText);
@@ -799,7 +803,7 @@ function addAttackOption(scenarioId) {
 
 function editAttackOption(id, scenarioId) {
   const scenario = currentLevel.attackScenarios.find(
-    (s) => s.id === scenarioId
+    (s) => s.id === scenarioId,
   );
   const option = scenario?.attackOptions?.find((o) => o.id === id);
   if (!option) return;
@@ -868,7 +872,9 @@ async function deleteAttackOption(id) {
   if (!confirm("Delete this attack option and all its choices?")) return;
 
   try {
-    const response = await fetch(`${API_BASE}/attack-options/${id}`, { method: "DELETE" });
+    const response = await fetch(`${API_BASE}/attack-options/${id}`, {
+      method: "DELETE",
+    });
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Delete failed:", errorText);
@@ -1008,7 +1014,9 @@ async function deleteDefenderChoice(id) {
   if (!confirm("Delete this defender choice?")) return;
 
   try {
-    const response = await fetch(`${API_BASE}/defender-choices/${id}`, { method: "DELETE" });
+    const response = await fetch(`${API_BASE}/defender-choices/${id}`, {
+      method: "DELETE",
+    });
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Delete failed:", errorText);
