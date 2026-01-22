@@ -185,6 +185,8 @@ public class GamePlayService {
         state.setAttacksPerformed(room.getAttacksPerformed());
         state.setLastActionMessage(room.getLastActionMessage());
         state.setLastOutcome(room.getLastOutcome());
+        state.setLastDefenderScoreDelta(room.getLastDefenderScoreDelta());
+        state.setLastAttackerScoreDelta(room.getLastAttackerScoreDelta());
         state.setStatus(room.getStatus().name());
 
         // Load current level info and set maxAttacks

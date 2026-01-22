@@ -117,6 +117,29 @@ function updateScoreDeltas(state) {
   }
 }
 
+function updateDefenderScoreDeltas(state) {
+  const defDefenderScoreDelta = document.getElementById(
+    "defDefenderScoreDelta",
+  );
+  const defAttackerScoreDelta = document.getElementById(
+    "defAttackerScoreDelta",
+  );
+
+  if (defDefenderScoreDelta && state.lastDefenderScoreDelta !== undefined) {
+    const defDelta = state.lastDefenderScoreDelta;
+    defDefenderScoreDelta.textContent =
+      defDelta >= 0 ? `+${defDelta}` : `${defDelta}`;
+    defDefenderScoreDelta.parentElement.className = `score-delta defender ${defDelta >= 0 ? "positive" : "negative"}`;
+  }
+
+  if (defAttackerScoreDelta && state.lastAttackerScoreDelta !== undefined) {
+    const atkDelta = state.lastAttackerScoreDelta;
+    defAttackerScoreDelta.textContent =
+      atkDelta >= 0 ? `+${atkDelta}` : `${atkDelta}`;
+    defAttackerScoreDelta.parentElement.className = `score-delta attacker ${atkDelta >= 0 ? "positive" : "negative"}`;
+  }
+}
+
 function updateRoundInfo(state) {
   // Update attack counter for both attacker and defender
   const attackElements = ["atkAttacksPerformed", "defAttacksPerformed"];
@@ -515,6 +538,8 @@ function updateDefenderUI(state) {
     document.getElementById("defOutcome").classList.remove("hidden");
     document.getElementById("defOutcomeMessage").textContent =
       state.lastOutcome || "Round completed";
+    // Update score deltas for defender view
+    updateDefenderScoreDeltas(state);
   } else {
     document.getElementById("defWaiting").classList.remove("hidden");
   }

@@ -27,6 +27,10 @@ public class GameStateDto {
     private String lastActionMessage;
     private String lastOutcome;
 
+    // Score deltas from last action
+    private Integer lastDefenderScoreDelta;
+    private Integer lastAttackerScoreDelta;
+
     // Current level info
     private String currentLevelName;
 
