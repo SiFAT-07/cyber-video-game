@@ -4,123 +4,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberWalk - Interactive Story Game</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>CyberWalk - Interactive Simulation</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
     <div id="app">
+        <!-- Transition Overlay -->
         <div id="transitionOverlay" class="transition-overlay"></div>
-        <!-- Loading Screen -->
-        <section id="loading-screen" class="screen active">
+
+        <!-- Initialize Loading Screen -->
+        <section id="loading-screen" class="screen active" style="background: black; z-index: 10000;">
             <div class="loader"></div>
-            <p style="letter-spacing: 4px; font-weight: 800; font-size: 0.8rem; color: var(--accent-blue);">INITIALIZING
-                SYSTEM...</p>
+            <p style="margin-top: 2rem; letter-spacing: 4px; font-weight: 800; font-size: 0.8rem; color: var(--neon-blue); font-family: var(--font-display);">
+                SYSTEM INITIALIZING...
+            </p>
         </section>
 
-        <!-- New Lobby Screen -->
+        <!-- Main Lobby Screen -->
         <section id="lobby-screen" class="screen">
-            <div class="lobby-content" style="position: absolute; bottom: 10%; width: 100%; padding: 0 5%;">
-                <h1
-                    style="font-size: 8rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 2rem; color: var(--accent-blue); text-shadow: 0 0 30px rgba(0, 210, 255, 0.5);">
-                    CYBERWALK</h1>
-                <div class="menu-items" style="display: flex; gap: 20px;">
-                    <button class="btn" onclick="startGame()">Play</button>
-                    <button class="btn" onclick="window.location.href='editor.html'">Level Editor</button>
-                    <button class="btn" onclick="showScreen('settings-overlay')">Settings</button>
-                    <button class="btn secondary" onclick="showScreen('extras-overlay')">Extras</button>
-                    <button class="btn" onclick="window.location.href='/logout'">Logout</button>
-                    <button class="btn" onclick="exitGame()">Exit Game</button>
+            <div class="lobby-content">
+                <h1 class="lobby-title">CYBERWALK</h1>
+                <div class="menu-items">
+                    <button class="btn" onclick="startGame()">ENTER SIMULATION</button>
+                    <button class="btn" onclick="window.location.href='editor.html'">LEVEL ARCHITECT</button>
+                    <button class="btn secondary" onclick="showScreen('settings-overlay')">SYSTEM CONFIG</button>
+                    <button class="btn secondary" onclick="showScreen('extras-overlay')">ARCHIVES</button>
+                    <button class="btn" onclick="window.location.href='/logout'" style="border-color: var(--neon-red); color: var(--neon-red);">ABORT SESSION</button>
                 </div>
+            </div>
+            <div style="position: absolute; bottom: 20px; right: 20px; font-size: 0.8rem; color: var(--text-muted);">
+                V 2.0.4 [STABLE]
             </div>
         </section>
 
         <!-- Settings Overlay -->
-        <section id="settings-overlay" class="screen glass">
-            <div class="modal-content" style="width: 80%; max-width: 800px; padding: 40px;">
-                <h2
-                    style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-blue); padding-bottom: 1rem;">
-                    SETTINGS</h2>
+        <section id="settings-overlay" class="screen" style="backdrop-filter: blur(5px);">
+            <div class="cyber-panel" style="width: 600px; max-width: 90%;">
+                <h2 style="margin-bottom: 2rem; text-align: center; border-bottom: 1px solid var(--neon-blue); padding-bottom: 1rem;">SYSTEM CONFIGURATION</h2>
 
-                <div class="setting-group" style="margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <label>GLOBAL VOLUME</label>
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--neon-blue);">
+                        <label>AUDIO OUTPUT LEVEL</label>
                         <span id="volume-val">80%</span>
                     </div>
-                    <input type="range" id="volume-slider" min="0" max="100" value="80"
-                        oninput="updateSetting('volume', this.value)">
+                    <input type="range" id="volume-slider" min="0" max="100" value="80" oninput="updateSetting('volume', this.value)">
                 </div>
 
-                <div class="setting-group" style="margin-bottom: 3rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <label>SCREEN BRIGHTNESS</label>
+                <div style="margin-bottom: 3rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--neon-blue);">
+                        <label>VISUAL INTENSITY</label>
                         <span id="brightness-val">100%</span>
                     </div>
-                    <input type="range" id="brightness-slider" min="50" max="150" value="100"
-                        oninput="updateSetting('brightness', this.value)">
+                    <input type="range" id="brightness-slider" min="50" max="150" value="100" oninput="updateSetting('brightness', this.value)">
                 </div>
 
-                <button class="btn" onclick="showScreen('lobby-screen')">Back to Lobby</button>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="showScreen('lobby-screen')">RETURN TO MENU</button>
+                </div>
             </div>
         </section>
 
         <!-- Extras Overlay -->
-        <section id="extras-overlay" class="screen glass">
-            <div class="modal-content" style="width: 80%; max-width: 800px; padding: 40px; text-align: left;">
-                <h2
-                    style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-orange); padding-bottom: 1rem;">
-                    EXTRAS</h2>
-                <div style="color: var(--text-secondary); line-height: 1.6; font-size: 1.1rem;">
-                    <p style="margin-bottom: 1.5rem;"><strong>Version:</strong> 1.0.15681</p>
-                    <p style="margin-bottom: 1.5rem;"><strong>Developer Notes:</strong> DISPATCH is a tactical narrative
-                        experience set in a near-future metropolitan area. Experience the life of an emergency responder
-                        in a world of high-tech surveillance and complex human stories.</p>
-                    <p>All assets and UI elements are designed to provide a seamless cinematic experience.</p>
+        <section id="extras-overlay" class="screen" style="backdrop-filter: blur(5px);">
+            <div class="cyber-panel" style="width: 700px; max-width: 90%;">
+                <h2 style="margin-bottom: 2rem; border-bottom: 1px solid var(--neon-yellow); color: var(--neon-yellow); padding-bottom: 1rem;">MISSION ARCHIVES</h2>
+                <div style="color: var(--text-muted); line-height: 1.8; font-size: 1rem; max-height: 300px; overflow-y: auto; padding-right: 1rem;">
+                    <p style="margin-bottom: 1rem;">
+                        <strong>OBJECTIVE:</strong> Train operatives in defensive and offensive cyber-tactics.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>SIMULATION PARAMETERS:</strong> Operatives are placed in a controlled digital environment ("The City") where they must execute or deflect social engineering attacks.
+                    </p>
+                    <p>
+                        All scenarios are based on real-world threat intelligence. Proceed with caution.
+                    </p>
                 </div>
-                <button class="btn secondary" style="margin-top: 3rem;"
-                    onclick="showScreen('lobby-screen')">Back</button>
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="btn secondary" onclick="showScreen('lobby-screen')">CLOSE ARCHIVE</button>
+                </div>
             </div>
         </section>
     </div>
 
-    <!-- Existing Game (Hidden initially) -->
-    <!-- Room Selection Screen (Formerly lobbyScreen) -->
-    <div id="roomSelectionScreen" class="hidden">
-        <h1>CyberWalk: Duel Mode</h1>
-        <div class="lobby-controls">
-            <div class="card">
-                <h3>Create Room</h3>
-                <button id="createRoomBtn" class="btn btn-primary">Create New Room</button>
+    <!-- Room Selection (Formerly Game Lobby) -->
+    <div id="roomSelectionScreen" class="hidden screen" style="background: var(--bg-darker); z-index: 50;">
+        <div style="width: 100%; max-width: 900px; padding: 2rem;">
+            <h1 style="text-align: center; margin-bottom: 3rem; font-size: 3rem;">CONNECTION HUB</h1>
+            
+            <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
+                <!-- Create Room -->
+                <div class="cyber-panel" style="width: 350px;">
+                    <h3 style="text-align: center; margin-bottom: 1.5rem;">HOST NEW SESSION</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">Initialize a secure channel for other operatives to join.</p>
+                    <button id="createRoomBtn" class="btn" style="width: 100%;">INITIALIZE</button>
+                </div>
+
+                <!-- Join Room -->
+                <div class="cyber-panel" style="width: 350px;">
+                    <h3 style="text-align: center; margin-bottom: 1.5rem;">JOIN SESSION</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text" id="roomIdInput" placeholder="ENTER CHANNEL ID">
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <select id="roleSelect">
+                            <option value="ATTACKER">ROLE: ATTACKER (RED)</option>
+                            <option value="DEFENDER">ROLE: DEFENDER (BLUE)</option>
+                        </select>
+                    </div>
+                    <button id="joinRoomBtn" class="btn secondary" style="width: 100%;">CONNECT</button>
+                </div>
             </div>
-            <div class="card">
-                <h3>Join Room</h3>
-                <input type="text" id="roomIdInput" placeholder="Enter Room ID">
-                <select id="roleSelect">
-                    <option value="ATTACKER">Attacker (Red Team)</option>
-                    <option value="DEFENDER">Defender (Blue Team)</option>
-                </select>
-                <button id="joinRoomBtn" class="btn btn-secondary">Join Game</button>
+
+            <div id="lobbyStatus" style="text-align: center; margin-top: 2rem; color: var(--neon-blue); font-family: var(--font-display);"></div>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <button class="btn" onclick="showScreen('lobby-screen'); hideGameComponents();" style="border-color: var(--text-muted); color: var(--text-muted);">DISCONNECT</button>
             </div>
         </div>
-        <div id="lobbyStatus" class="status-msg"></div>
-        <!-- Back Button for Navigation -->
-        <button class="btn" onclick="showScreen('lobby-screen'); hideGameComponents();" style="margin-top: 2rem;">Back
-            to Main Menu</button>
     </div>
 
-    <!-- NEW: Attacker Game Interface -->
+    <!-- ATTACKER INTERFACE -->
     <div id="attackerGameArea" class="hidden game-area">
-        <div class="game-header attacker-header">
+        <div class="game-header">
             <div class="header-left">
                 <span class="role-badge attacker">⚔️ ATTACKER</span>
-                <span class="room-id">Room: <span id="atkRoomId"></span></span>
+                <span class="room-id">CHANNEL: <span id="atkRoomId" style="color: var(--text-main);">...</span></span>
             </div>
             <div class="header-center">
-                <div class="round-info">
-                    Attacks: <span id="atkAttacksPerformed">0</span> / <span id="atkMaxAttacks">5</span>
+                <div style="font-family: var(--font-display); font-size: 1.2rem;">
+                    ROUNDS: <span id="atkAttacksPerformed" style="color: var(--neon-blue);">0</span> / <span id="atkMaxAttacks">5</span>
                 </div>
             </div>
             <div class="header-right">
@@ -128,95 +144,100 @@
                     <span class="score attacker-score">🔴 <span id="atkScore">0</span></span>
                     <span class="score defender-score">🔵 <span id="atkDefScore">0</span></span>
                 </div>
-                <button class="btn btn-small exit-btn" onclick="exitToLobby()">Exit</button>
+                <button class="btn" style="padding: 5px 15px; font-size: 0.8rem;" onclick="exitToLobby()">ABORT</button>
             </div>
         </div>
 
         <div class="game-content">
-            <!-- Phase: Level Selection -->
+            <!-- Phase 1: Level Selection -->
             <div id="atkLevelSelect" class="game-phase">
-                <h2 class="phase-title">Select Target Environment</h2>
+                <h2 style="border-bottom: 1px solid var(--neon-red); display: inline-block; padding-bottom: 5px;">SELECT TARGET ENVIRONMENT</h2>
                 <div id="levelCards" class="selection-grid">
-                    <!-- Loaded dynamically -->
+                    <!-- Dynamic Content -->
                 </div>
             </div>
 
-            <!-- Phase: Target Profile Info -->
+            <!-- Phase 2: Target Profile -->
             <div id="atkProfileInfo" class="game-phase hidden">
-                <h2 class="phase-title">Target Profile</h2>
+                <h2 style="margin-bottom: 1rem;">TARGET ACQUIRED</h2>
                 <div class="profile-display">
                     <div class="profile-avatar" id="targetAvatar">👤</div>
-                    <div class="profile-details">
-                        <h3 id="targetName">Loading...</h3>
-                        <p id="targetDescription"></p>
+                    <div class="profile-details" style="flex: 1;">
+                        <h3 id="targetName" style="color: var(--neon-blue); font-size: 2rem; margin-bottom: 0.5rem;">LOADING...</h3>
+                        <p id="targetDescription" style="color: var(--text-muted); font-style: italic; margin-bottom: 1.5rem;"></p>
                         <div class="profile-stats">
-                            <div class="stat"><span class="stat-label">Age:</span> <span id="targetAge">-</span></div>
                             <div class="stat"><span class="stat-label">Age Group:</span> <span id="targetAgeGroup">-</span></div>
                             <div class="stat"><span class="stat-label">Occupation:</span> <span id="targetOccupation">-</span></div>
-                            <div class="stat"><span class="stat-label">Tech Level:</span> <span id="targetTechLevel">-</span></div>
-                            <div class="stat"><span class="stat-label">Mental State:</span> <span id="targetMentalState">-</span></div>
-                            <div class="stat"><span class="stat-label">Financial Status:</span> <span id="targetFinancialStatus">-</span></div>
+                            <div class="stat"><span class="stat-label">Tech Proficiency:</span> <span id="targetTechLevel">-</span></div>
+                            <div class="stat"><span class="stat-label">Vulnerability:</span> <span id="targetMentalState">-</span></div>
+                            <div class="stat"><span class="stat-label">Financial:</span> <span id="targetFinancialStatus">-</span></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Phase: Attack Type Selection -->
+            <!-- Phase 3: Attack Type -->
             <div id="atkTypeSelect" class="game-phase hidden">
-                <h2 class="phase-title">Choose Attack Vector</h2>
-                <p class="phase-description">Select how you want to attack the target</p>
-                <div id="attackTypeCards" class="selection-grid">
-                    <!-- Loaded dynamically -->
+                <h2 style="border-bottom: 1px solid var(--neon-red); display: inline-block; padding-bottom: 5px;">SELECT ATTACK VECTOR</h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Choose the optimal vulnerability to exploit.</p>
+                <div id="attackTypeCards" class="selection-grid" style="margin-top: 1.5rem;">
+                    <!-- Dynamic Content -->
                 </div>
             </div>
 
-            <!-- Phase: Attack Option Selection -->
+            <!-- Phase 4: Attack Option -->
             <div id="atkOptionSelect" class="game-phase hidden">
-                <h2 class="phase-title">Configure Your Attack</h2>
-                <p class="phase-description">Choose your specific approach</p>
-                <div id="attackOptionCards" class="selection-grid options-grid">
-                    <!-- Loaded dynamically -->
+                 <h2 style="border-bottom: 1px solid var(--neon-red); display: inline-block; padding-bottom: 5px;">CONFIGURE PAYLOAD</h2>
+                 <p style="color: var(--text-muted); margin-top: 0.5rem;">Select the specific method of execution.</p>
+                <div id="attackOptionCards" class="selection-grid" style="margin-top: 1.5rem;">
+                    <!-- Dynamic Content -->
                 </div>
             </div>
 
-            <!-- Phase: Waiting for Defender -->
-            <div id="atkWaiting" class="game-phase hidden">
-                <div class="waiting-display">
-                    <div class="spinner"></div>
-                    <h2>Attack Launched!</h2>
-                    <p id="attackLaunchedMsg">Waiting for defender to respond...</p>
-                    <div class="attack-preview">
-                        <div class="preview-label">Your Attack:</div>
-                        <div id="attackPreviewContent" class="preview-content"></div>
-                    </div>
+            <!-- Phase 5: Waiting -->
+            <div id="atkWaiting" class="game-phase hidden" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="loader"></div>
+                <h2 style="margin-top: 2rem; color: var(--neon-blue);">ATTACK IN PROGRESS</h2>
+                <p id="attackLaunchedMsg" style="color: var(--text-muted); letter-spacing: 2px; margin-top: 1rem;">Awaiting Defender Response...</p>
+                <div class="cyber-panel" style="margin-top: 3rem; max-width: 600px; width: 100%;">
+                    <div style="font-size: 0.8rem; color: var(--neon-red); letter-spacing: 2px; margin-bottom: 1rem;">// EXECUTING PAYLOAD:</div>
+                    <div id="attackPreviewContent" style="color: var(--text-main); font-family: monospace;"></div>
                 </div>
             </div>
 
-            <!-- Phase: Outcome Display -->
-            <div id="atkOutcome" class="game-phase hidden">
-                <div class="outcome-display">
-                    <h2>Round Result</h2>
-                    <div id="outcomeMessage" class="outcome-message"></div>
-                    <div class="score-change">
-                        <div class="score-delta attacker"><span id="atkScoreDelta">+0</span></div>
-                        <div class="score-delta defender"><span id="defScoreDelta">+0</span></div>
+            <!-- Phase 6: Outcome -->
+            <div id="atkOutcome" class="game-phase hidden" style="text-align: center; margin-top: 5vh;">
+                <div class="cyber-panel" style="display: inline-block; width: 80%; max-width: 700px;">
+                    <h2 style="font-size: 3rem; margin-bottom: 2rem;">ROUND STATUS</h2>
+                    <div id="outcomeMessage" style="font-size: 1.5rem; margin-bottom: 2rem; min-height: 3em;"></div>
+                    
+                    <div style="display: flex; justify-content: center; gap: 4rem; margin-bottom: 3rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">ATTACKER</div>
+                            <div id="atkScoreDelta" style="font-size: 2.5rem; color: var(--neon-red); font-weight: bold;">+0</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">DEFENDER</div>
+                            <div id="defScoreDelta" style="font-size: 2.5rem; color: var(--neon-green); font-weight: bold;">+0</div>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" onclick="nextRound()">Continue</button>
+
+                    <button class="btn" onclick="nextRound()">INITIATE NEXT CYCLE</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- NEW: Defender Game Interface -->
+    <!-- DEFENDER INTERFACE -->
     <div id="defenderGameArea" class="hidden game-area">
-        <div class="game-header defender-header">
-            <div class="header-left">
+        <div class="game-header">
+             <div class="header-left">
                 <span class="role-badge defender">🛡️ DEFENDER</span>
-                <span class="room-id">Room: <span id="defRoomId"></span></span>
+                <span class="room-id">CHANNEL: <span id="defRoomId" style="color: var(--text-main);">...</span></span>
             </div>
-            <div class="header-center">
-                <div class="round-info">
-                    Attacks: <span id="defAttacksPerformed">0</span> / <span id="defMaxAttacks">5</span>
+             <div class="header-center">
+                <div style="font-family: var(--font-display); font-size: 1.2rem;">
+                    INTRUSIONS: <span id="defAttacksPerformed" style="color: var(--neon-blue);">0</span> / <span id="defMaxAttacks">5</span>
                 </div>
             </div>
             <div class="header-right">
@@ -224,123 +245,109 @@
                     <span class="score defender-score">🔵 <span id="defScore">0</span></span>
                     <span class="score attacker-score">🔴 <span id="defAtkScore">0</span></span>
                 </div>
-                <button class="btn btn-small exit-btn" onclick="exitToLobby()">Exit</button>
+                <button class="btn" style="padding: 5px 15px; font-size: 0.8rem;" onclick="exitToLobby()">ABORT</button>
             </div>
         </div>
 
         <div class="game-content">
-            <!-- Phase: Waiting for Attacker -->
-            <div id="defWaiting" class="game-phase">
-                <div class="waiting-display">
-                    <div class="spinner"></div>
-                    <h2>Standing By...</h2>
-                    <p>Waiting for attacker to launch their attack</p>
-                    
-                    <!-- Defender Profile Display -->
-                    <div id="defenderProfileDisplay" class="profile-display" style="margin-top: 2rem; display: none;">
-                        <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">Your Profile</h3>
-                        <div class="profile-details" style="background: rgba(0, 210, 255, 0.1); padding: 1.5rem; border-radius: 8px;">
-                            <div class="profile-stats">
+            <!-- Phase 1: Waiting -->
+            <div id="defWaiting" class="game-phase" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="loader" style="border-color: rgba(0, 255, 157, 0.3); border-top-color: var(--neon-green);"></div>
+                <h2 style="margin-top: 2rem; color: var(--neon-green);">SYSTEM MONITORING</h2>
+                <p style="color: var(--text-muted); letter-spacing: 2px; margin-top: 1rem;">Scanning for incoming threats...</p>
+
+                <!-- Profile Info -->
+                <div id="defenderProfileDisplay" class="hidden" style="margin-top: 3rem; width: 100%; max-width: 800px;">
+                    <div class="profile-display" style="border-color: var(--neon-green);">
+                         <div class="profile-details" style="flex: 1;">
+                            <h3 style="color: var(--neon-green); font-size: 1.5rem; margin-bottom: 0.5rem;">YOUR DIGITAL IDENTITY</h3>
+                             <p id="defProfileDescription" style="color: var(--text-muted); font-style: italic; margin-bottom: 1.5rem;"></p>
+                             <div class="profile-stats">
                                 <div class="stat"><span class="stat-label">Name:</span> <span id="defProfileName">-</span></div>
-                                <div class="stat"><span class="stat-label">Age:</span> <span id="defProfileAge">-</span></div>
-                                <div class="stat"><span class="stat-label">Age Group:</span> <span id="defProfileAgeGroup">-</span></div>
                                 <div class="stat"><span class="stat-label">Occupation:</span> <span id="defProfileOccupation">-</span></div>
                                 <div class="stat"><span class="stat-label">Tech Level:</span> <span id="defProfileTechLevel">-</span></div>
-                                <div class="stat"><span class="stat-label">Mental State:</span> <span id="defProfileMentalState">-</span></div>
-                                <div class="stat"><span class="stat-label">Financial Status:</span> <span id="defProfileFinancialStatus">-</span></div>
+                                <div class="stat"><span class="stat-label">Stress:</span> <span id="defProfileMentalState">-</span></div>
                             </div>
-                            <p id="defProfileDescription" style="margin-top: 1rem; font-style: italic; color: var(--text-secondary);"></p>
                         </div>
                     </div>
-                    
-                    <div class="defender-tips">
-                        <h4>🔒 Security Tips While You Wait:</h4>
-                        <ul>
-                            <li>Never share passwords or OTPs with anyone</li>
-                            <li>Verify caller identity through official channels</li>
-                            <li>Check URLs carefully before clicking</li>
-                            <li>When in doubt, hang up and call back</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
 
-            <!-- Phase: Under Attack - Response Required -->
+            <!-- Phase 2: Under Attack -->
             <div id="defUnderAttack" class="game-phase hidden">
-                <div class="attack-notification">
-                    <div class="alert-icon">⚠️</div>
-                    <h2>Incoming Communication!</h2>
+                <div style="background: rgba(255, 42, 42, 0.1); border: 1px solid var(--neon-red); padding: 1rem; text-align: center; margin-bottom: 2rem; animation: pulse-red 2s infinite;">
+                    <h2 style="color: var(--neon-red); margin: 0;">⚠️ THREAT DETECTED ⚠️</h2>
                 </div>
-                
-                <div class="attack-content">
-                    <div class="sender-info">
-                        <span class="sender-label">From:</span>
-                        <span id="attackSender" class="sender-name">Unknown</span>
+
+                <div class="cyber-panel" style="margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                         <span style="color: var(--text-muted);">SOURCE:</span>
+                         <span id="attackSender" style="color: var(--neon-blue); font-weight: bold;">UNKNOWN</span>
                     </div>
-                    <div class="message-box">
-                        <p id="attackMessage">Loading message...</p>
+                    <div id="attackMessage" style="font-size: 1.2rem; line-height: 1.6;">
+                        Loading packet content...
                     </div>
                 </div>
 
-                <div class="response-section">
-                    <h3>How do you respond?</h3>
-                    <div id="defenderChoices" class="choices-grid">
-                        <!-- Loaded dynamically -->
-                    </div>
+                <h3 style="margin-bottom: 1.5rem; color: var(--neon-green);">SELECT COUNTERMEASURE:</h3>
+                <div id="defenderChoices" class="selection-grid">
+                    <!-- Dynamic Choices -->
                 </div>
             </div>
 
-            <!-- Phase: Outcome Display -->
-            <div id="defOutcome" class="game-phase hidden">
-                <div class="outcome-display">
-                    <h2 id="defOutcomeTitle">Result</h2>
-                    <div id="defOutcomeMessage" class="outcome-message"></div>
-                    <div class="educational-note" id="educationalNote">
-                        <!-- Educational content -->
+            <!-- Phase 3: Outcome -->
+            <div id="defOutcome" class="game-phase hidden" style="text-align: center; margin-top: 5vh;">
+                <div class="cyber-panel" style="display: inline-block; width: 80%; max-width: 700px; border-color: var(--neon-green);">
+                    <h2 id="defOutcomeTitle" style="font-size: 3rem; margin-bottom: 2rem;">ANALYSIS COMPLETE</h2>
+                    <div id="defOutcomeMessage" style="font-size: 1.5rem; margin-bottom: 1rem;"></div>
+                    
+                    <div id="educationalNote" style="background: rgba(0, 255, 157, 0.05); padding: 1rem; margin-bottom: 2rem; border-left: 3px solid var(--neon-green); text-align: left;">
                     </div>
-                    <div class="score-change">
-                        <div class="score-delta defender"><span id="defDefenderScoreDelta">+0</span></div>
-                        <div class="score-delta attacker"><span id="defAttackerScoreDelta">+0</span></div>
+
+                    <div style="display: flex; justify-content: center; gap: 4rem; margin-bottom: 3rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">DEFENDER</div>
+                            <div id="defDefenderScoreDelta" style="font-size: 2.5rem; color: var(--neon-green); font-weight: bold;">+0</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">ATTACKER</div>
+                            <div id="defAttackerScoreDelta" style="font-size: 2.5rem; color: var(--neon-red); font-weight: bold;">+0</div>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" onclick="defenderContinue()">Continue</button>
+
+                    <button class="btn secondary" onclick="defenderContinue()">RESUME MONITORING</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Game Over Screen -->
-    <div id="gameOverScreen" class="hidden">
-        <div class="game-over-content glass" style="max-width: 600px; width: 90%;">
-            <h1 id="gameOverTitle" style="color: var(--accent-blue); margin-bottom: 1rem;">GAME OVER</h1>
-            <p id="gameOverSubtitle" style="color: var(--text-secondary); margin-bottom: 2rem;"></p>
+    <div id="gameOverScreen" class="hidden screen" style="background: rgba(0,0,0,0.95); z-index: 2000;">
+        <div class="cyber-panel" style="width: 700px; max-width: 95%; text-align: center; border-width: 2px;">
+            <h1 id="gameOverTitle" style="font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 0 30px currentColor;">MISSION END</h1>
+            <p id="gameOverSubtitle" style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 3rem;">SIMULATION SETTLED</p>
 
-            <div class="final-scores"
-                style="display: flex; justify-content: space-around; margin-bottom: 2rem; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px;">
-                <div class="score-item">
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">DEFENDER</p>
-                    <p id="finalDefenderScore" style="font-size: 2.5rem; font-weight: 800; color: #00ff7f;">0</p>
+            <div style="display: flex; justify-content: center; gap: 4rem; margin-bottom: 3rem;">
+                <div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">DEFENDER SCORE</div>
+                    <div id="finalDefenderScore" style="font-size: 3.5rem; color: var(--neon-green); font-family: var(--font-display);">0</div>
                 </div>
-                <div class="score-item">
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">ATTACKER</p>
-                    <p id="finalAttackerScore" style="font-size: 2.5rem; font-weight: 800; color: #ff4b2b;">0</p>
-                </div>
-            </div>
-
-            <div id="gameAnalysis" style="text-align: left; margin-bottom: 2rem;">
-                <h3
-                    style="font-size: 0.9rem; letter-spacing: 2px; color: var(--accent-orange); margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
-                    SECURITY LESSONS</h3>
-                <div id="lessonsLearned" style="color: var(--text-secondary); font-size: 0.9rem;">
-                    <!-- Populated via JS -->
+                <div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">ATTACKER SCORE</div>
+                    <div id="finalAttackerScore" style="font-size: 3.5rem; color: var(--neon-red); font-family: var(--font-display);">0</div>
                 </div>
             </div>
 
-            <button id="restartButton" class="btn primary" style="width: 100%;" onclick="exitToLobby()">RETURN TO MAIN MENU</button>
+            <div style="text-align: left; margin-bottom: 3rem; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 1rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--neon-yellow);">DEBRIEFING / KEY LEARNINGS</h3>
+                <div id="lessonsLearned" style="color: var(--text-main); font-size: 0.9rem;"></div>
+            </div>
+
+            <button class="btn" onclick="exitToLobby()" style="width: 100%;">RETURN TO BASE</button>
         </div>
     </div>
 
     <script src="js/app.js"></script>
     <script src="js/game.js"></script>
 </body>
-
 </html>

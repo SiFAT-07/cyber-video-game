@@ -3,143 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - CyberWalk</title>
+    <title>NEW AGENT REGISTRATION - CYBERWALK</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        .auth-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-container::before {
-            content: "";
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/bg.png');
-            background-size: cover;
-            background-position: center;
-            filter: blur(8px);
-            z-index: -1;
-        }
-
-        .auth-box {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 16px;
-            width: 400px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
-            text-align: center;
-        }
-
-        .auth-box h2 {
-            margin-bottom: 2rem;
-            color: #00ffcc;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #00ffcc;
-        }
-
-        .btn-auth {
-            width: 100%;
-            margin-top: 1rem;
-            background: linear-gradient(90deg, #00ffcc 0%, #3a7bd5 100%);
-            border: none;
-            padding: 12px;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.2s;
-        }
-
-        .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
-        }
-
-        .auth-link {
-            margin-top: 1.5rem;
-            display: block;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .auth-link:hover {
-            color: #00ffcc;
-        }
-
-        .status-msg {
-            margin-bottom: 1rem;
-            font-weight: bold;
-        }
-        .error { color: #ff4b2b; }
-        .success { color: #00ffcc; }
-    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-box">
-            <h2>Create Profile</h2>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <div class="auth-wrapper">
+        <div class="cyber-panel auth-panel">
+            <h2 style="text-align: center; margin-bottom: 2rem;">CREATE IDENTITY</h2>
             
-            <div id="status-msg" class="status-msg"></div>
+            <div id="status-msg" style="text-align: center; margin-bottom: 1.5rem; font-weight: bold; min-height: 1.5em;"></div>
 
             <form id="signupForm">
-                <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" id="username" required>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="color: var(--neon-blue); font-family: var(--font-display); letter-spacing: 2px; font-size: 0.8rem;">CODENAME (USERNAME)</label>
+                    <input type="text" id="username" required placeholder="Select Identifier">
                 </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="password" required>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="color: var(--neon-blue); font-family: var(--font-display); letter-spacing: 2px; font-size: 0.8rem;">SECURE KEY (PASSWORD)</label>
+                    <input type="password" id="password" required placeholder="Set Password">
                 </div>
-                <div class="input-group">
-                    <label>Confirm Password</label>
-                    <input type="password" id="confirmPassword" required>
+                <div style="margin-bottom: 2rem;">
+                    <label style="color: var(--neon-blue); font-family: var(--font-display); letter-spacing: 2px; font-size: 0.8rem;">CONFIRM KEY</label>
+                    <input type="password" id="confirmPassword" required placeholder="Confirm Password">
                 </div>
-                <button type="submit" class="btn btn-auth">Register</button>
+                <button type="submit" class="btn" style="width: 100%;">REGISTER AGENT</button>
             </form>
 
-            <a href="login.html" class="auth-link">Already have an account? Login</a>
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="login.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">
+                    [ EXISTING AGENT? LOGIN HERE ]
+                </a>
+            </div>
         </div>
     </div>
 
@@ -151,12 +48,12 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const statusMsg = document.getElementById('status-msg');
 
-            statusMsg.textContent = '';
-            statusMsg.className = 'status-msg';
+            statusMsg.textContent = 'PROCESSING...';
+            statusMsg.style.color = 'var(--text-muted)';
 
             if (password !== confirmPassword) {
-                statusMsg.textContent = "Passwords do not match!";
-                statusMsg.classList.add('error');
+                statusMsg.textContent = "ERROR: KEY MISMATCH";
+                statusMsg.style.color = "var(--neon-red)";
                 return;
             }
 
@@ -168,18 +65,18 @@
                 });
 
                 if (response.ok) {
-                    statusMsg.textContent = "Registration Successful! Redirecting...";
-                    statusMsg.classList.add('success');
+                    statusMsg.textContent = "REGISTRATION COMPLETE - REDIRECTING...";
+                    statusMsg.style.color = "var(--neon-green)";
                     setTimeout(() => window.location.href = 'login.html', 1500);
                 } else {
                     const errorText = await response.text();
-                    statusMsg.textContent = errorText || "Registration failed.";
-                    statusMsg.classList.add('error');
+                    statusMsg.textContent = "ERROR: " + (errorText || "REGISTRATION FAILED");
+                    statusMsg.style.color = "var(--neon-red)";
                 }
             } catch (err) {
                 console.error(err);
-                statusMsg.textContent = "Network error occurred.";
-                statusMsg.classList.add('error');
+                statusMsg.textContent = "SYSTEM ERROR: NETWORK FAILURE";
+                statusMsg.style.color = "var(--neon-red)";
             }
         });
     </script>

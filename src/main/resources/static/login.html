@@ -3,138 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CyberWalk</title>
+    <title>SECURE LOGIN - CYBERWALK</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        .auth-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-container::before {
-            content: "";
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/bg.png');
-            background-size: cover;
-            background-position: center;
-            filter: blur(8px);
-            z-index: -1;
-        }
-
-        .auth-box {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 16px;
-            width: 400px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
-            text-align: center;
-        }
-
-        .auth-box h2 {
-            margin-bottom: 2rem;
-            color: #00d2ff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #00d2ff;
-        }
-
-        .btn-auth {
-            width: 100%;
-            margin-top: 1rem;
-            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-            border: none;
-            padding: 12px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.2s;
-        }
-
-        .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-        }
-
-        .auth-link {
-            margin-top: 1.5rem;
-            display: block;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .auth-link:hover {
-            color: #00d2ff;
-        }
-
-        .error-msg {
-            color: #ff4b2b;
-            margin-bottom: 1rem;
-            display: none;
-        }
-    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-box">
-            <h2>System Login</h2>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <div class="auth-wrapper">
+        <div class="cyber-panel auth-panel">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Authenticating...</h2>
             
-            <div id="error-msg" class="error-msg">Invaild credentials</div>
+            <div id="error-msg" style="color: var(--neon-red); text-align: center; display: none; margin-bottom: 1rem; border: 1px solid var(--neon-red); padding: 10px;">
+                ACCESS DENIED: Invalid Credentials
+            </div>
 
             <form action="/login" method="post">
-                <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required autofocus>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="color: var(--neon-blue); font-family: var(--font-display); letter-spacing: 2px; font-size: 0.8rem;">AGENT ID</label>
+                    <input type="text" name="username" required autofocus placeholder="Enter Username">
                 </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
+                <div style="margin-bottom: 2rem;">
+                    <label style="color: var(--neon-blue); font-family: var(--font-display); letter-spacing: 2px; font-size: 0.8rem;">PASSCODE</label>
+                    <input type="password" name="password" required placeholder="Enter Password">
                 </div>
-                <button type="submit" class="btn btn-auth">Authenticate</button>
+                <button type="submit" class="btn" style="width: 100%;">Initialize Session</button>
             </form>
 
-            <a href="signup.html" class="auth-link">New User? Register Profile</a>
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="signup.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">
+                    [ NO ID FOUND? REGISTER NEW PROFILE ]
+                </a>
+            </div>
         </div>
     </div>
 
