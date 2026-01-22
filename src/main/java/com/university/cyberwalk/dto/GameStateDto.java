@@ -13,28 +13,34 @@ public class GameStateDto {
     private String roomId;
     private String status;
     private String gamePhase;
-    
+
     private int attackerScore;
     private int defenderScore;
-    
+
     private boolean isAttackerTurn;
     private int currentRound;
     private int maxRounds;
-    
+
+    private int attacksPerformed;
+    private int maxAttacks;
+
     private String lastActionMessage;
     private String lastOutcome;
-    
+
     // Current level info
     private String currentLevelName;
-    
-    // Defender profile info (visible to attacker for strategy)
+
+    // Defender profile info (visible to both attacker and defender)
     private String defenderProfileName;
     private String defenderProfileDescription;
     private int defenderAge;
+    private String defenderAgeGroup;
     private String defenderOccupation;
-    private List<String> defenderRelationships;
-    private List<String> defenderVulnerabilities;
-    
+    private String defenderTechSavviness;
+    private String defenderMentalState;
+    private String defenderFinancialStatus;
+    private String defenderAvatarIcon;
+
     // Current attack info (for defender)
     private String currentAttackMessage;
     private String impersonatedEntity;

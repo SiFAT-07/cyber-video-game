@@ -15,9 +15,5 @@ public class DefenderChoiceDto {
     private int defenderScoreDelta;
     private int attackerScoreDelta;
     private String choiceType;
-    private boolean isCriticallyWrong;
-    private boolean isCriticallyRight;
     private String educationalNote;
-    private Long followUpAttackOptionId;
-    private boolean endsScenario;
 }

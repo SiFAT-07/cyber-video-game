@@ -50,6 +50,9 @@ public class GameRoom {
     private int currentRound = 1;
     private int maxRounds = 3;
 
+    // Attack count tracking
+    private int attacksPerformed = 0;
+
     // Last action info for display
     @Column(length = 1000)
     private String lastActionMessage;

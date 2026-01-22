@@ -59,6 +59,7 @@ public class LevelEditorService {
         level.setDifficulty(dto.getDifficulty());
         level.setEnabled(dto.isEnabled());
         level.setOrderIndex(dto.getOrderIndex());
+        level.setMaxAttacks(dto.getMaxAttacks() > 0 ? dto.getMaxAttacks() : 5);
 
         Level savedLevel = levelRepository.save(level);
         return convertToLevelDto(savedLevel);
@@ -74,6 +75,7 @@ public class LevelEditorService {
         level.setDifficulty(dto.getDifficulty());
         level.setEnabled(dto.isEnabled());
         level.setOrderIndex(dto.getOrderIndex());
+        level.setMaxAttacks(dto.getMaxAttacks() > 0 ? dto.getMaxAttacks() : 5);
 
         Level savedLevel = levelRepository.save(level);
         return convertToLevelDto(savedLevel);
@@ -221,6 +223,7 @@ public class LevelEditorService {
         dto.setDifficulty(level.getDifficulty());
         dto.setEnabled(level.isEnabled());
         dto.setOrderIndex(level.getOrderIndex());
+        dto.setMaxAttacks(level.getMaxAttacks());
 
         if (level.getDefenderProfiles() != null) {
             dto.setDefenderProfiles(level.getDefenderProfiles().stream()
@@ -248,8 +251,6 @@ public class LevelEditorService {
         dto.setTechSavviness(profile.getTechSavviness());
         dto.setMentalState(profile.getMentalState());
         dto.setFinancialStatus(profile.getFinancialStatus());
-        dto.setRelationships(new ArrayList<>(profile.getRelationships()));
-        dto.setVulnerabilities(new ArrayList<>(profile.getVulnerabilities()));
         dto.setAvatarIcon(profile.getAvatarIcon());
         return dto;
     }
@@ -300,11 +301,7 @@ public class LevelEditorService {
         dto.setDefenderScoreDelta(choice.getDefenderScoreDelta());
         dto.setAttackerScoreDelta(choice.getAttackerScoreDelta());
         dto.setChoiceType(choice.getChoiceType());
-        dto.setCriticallyWrong(choice.isCriticallyWrong());
-        dto.setCriticallyRight(choice.isCriticallyRight());
         dto.setEducationalNote(choice.getEducationalNote());
-        dto.setFollowUpAttackOptionId(choice.getFollowUpAttackOptionId());
-        dto.setEndsScenario(choice.isEndsScenario());
         return dto;
     }
 
@@ -319,8 +316,6 @@ public class LevelEditorService {
         profile.setTechSavviness(dto.getTechSavviness());
         profile.setMentalState(dto.getMentalState());
         profile.setFinancialStatus(dto.getFinancialStatus());
-        profile.setRelationships(dto.getRelationships() != null ? dto.getRelationships() : new ArrayList<>());
-        profile.setVulnerabilities(dto.getVulnerabilities() != null ? dto.getVulnerabilities() : new ArrayList<>());
         profile.setAvatarIcon(dto.getAvatarIcon());
     }
 
@@ -341,10 +336,6 @@ public class LevelEditorService {
         choice.setDefenderScoreDelta(dto.getDefenderScoreDelta());
         choice.setAttackerScoreDelta(dto.getAttackerScoreDelta());
         choice.setChoiceType(dto.getChoiceType());
-        choice.setCriticallyWrong(dto.isCriticallyWrong());
-        choice.setCriticallyRight(dto.isCriticallyRight());
         choice.setEducationalNote(dto.getEducationalNote());
-        choice.setFollowUpAttackOptionId(dto.getFollowUpAttackOptionId());
-        choice.setEndsScenario(dto.isEndsScenario());
     }
 }

@@ -119,7 +119,9 @@
                 <span class="room-id">Room: <span id="atkRoomId"></span></span>
             </div>
             <div class="header-center">
-                <div class="round-info">Round <span id="atkRoundNum">1</span> / <span id="atkMaxRounds">3</span></div>
+                <div class="round-info">
+                    Attacks: <span id="atkAttacksPerformed">0</span> / <span id="atkMaxAttacks">5</span>
+                </div>
             </div>
             <div class="header-right">
                 <div class="scores">
@@ -149,21 +151,14 @@
                         <p id="targetDescription"></p>
                         <div class="profile-stats">
                             <div class="stat"><span class="stat-label">Age:</span> <span id="targetAge">-</span></div>
+                            <div class="stat"><span class="stat-label">Age Group:</span> <span id="targetAgeGroup">-</span></div>
                             <div class="stat"><span class="stat-label">Occupation:</span> <span id="targetOccupation">-</span></div>
                             <div class="stat"><span class="stat-label">Tech Level:</span> <span id="targetTechLevel">-</span></div>
                             <div class="stat"><span class="stat-label">Mental State:</span> <span id="targetMentalState">-</span></div>
-                        </div>
-                        <div class="profile-tags">
-                            <h4>Relationships (Can Impersonate):</h4>
-                            <div id="targetRelationships" class="tags"></div>
-                        </div>
-                        <div class="profile-tags">
-                            <h4>Vulnerabilities:</h4>
-                            <div id="targetVulnerabilities" class="tags vulnerability-tags"></div>
+                            <div class="stat"><span class="stat-label">Financial Status:</span> <span id="targetFinancialStatus">-</span></div>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="proceedToAttackTypes()">Continue to Attack Selection →</button>
             </div>
 
             <!-- Phase: Attack Type Selection -->
@@ -220,7 +215,9 @@
                 <span class="room-id">Room: <span id="defRoomId"></span></span>
             </div>
             <div class="header-center">
-                <div class="round-info">Round <span id="defRoundNum">1</span> / <span id="defMaxRounds">3</span></div>
+                <div class="round-info">
+                    Attacks: <span id="defAttacksPerformed">0</span> / <span id="defMaxAttacks">5</span>
+                </div>
             </div>
             <div class="header-right">
                 <div class="scores">
@@ -238,6 +235,24 @@
                     <div class="spinner"></div>
                     <h2>Standing By...</h2>
                     <p>Waiting for attacker to launch their attack</p>
+                    
+                    <!-- Defender Profile Display -->
+                    <div id="defenderProfileDisplay" class="profile-display" style="margin-top: 2rem; display: none;">
+                        <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">Your Profile</h3>
+                        <div class="profile-details" style="background: rgba(0, 210, 255, 0.1); padding: 1.5rem; border-radius: 8px;">
+                            <div class="profile-stats">
+                                <div class="stat"><span class="stat-label">Name:</span> <span id="defProfileName">-</span></div>
+                                <div class="stat"><span class="stat-label">Age:</span> <span id="defProfileAge">-</span></div>
+                                <div class="stat"><span class="stat-label">Age Group:</span> <span id="defProfileAgeGroup">-</span></div>
+                                <div class="stat"><span class="stat-label">Occupation:</span> <span id="defProfileOccupation">-</span></div>
+                                <div class="stat"><span class="stat-label">Tech Level:</span> <span id="defProfileTechLevel">-</span></div>
+                                <div class="stat"><span class="stat-label">Mental State:</span> <span id="defProfileMentalState">-</span></div>
+                                <div class="stat"><span class="stat-label">Financial Status:</span> <span id="defProfileFinancialStatus">-</span></div>
+                            </div>
+                            <p id="defProfileDescription" style="margin-top: 1rem; font-style: italic; color: var(--text-secondary);"></p>
+                        </div>
+                    </div>
+                    
                     <div class="defender-tips">
                         <h4>🔒 Security Tips While You Wait:</h4>
                         <ul>

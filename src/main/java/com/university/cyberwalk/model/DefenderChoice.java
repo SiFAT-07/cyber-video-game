@@ -33,16 +33,8 @@ public class DefenderChoice {
     // Choice categorization
     private String choiceType; // CORRECT, WRONG, RISKY, NEUTRAL
 
-    private boolean isCriticallyWrong = false; // Catastrophic mistake
-    private boolean isCriticallyRight = false; // Perfect response
-
     @Column(length = 1000)
     private String educationalNote; // Teaching moment - explains why this is good/bad
-
-    // Follow-up scenario (optional)
-    private Long followUpAttackOptionId; // If this leads to another stage
-
-    private boolean endsScenario = false; // If true, this choice ends the current scenario
 
     @ManyToOne
     @JoinColumn(name = "attack_option_id")

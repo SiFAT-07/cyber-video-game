@@ -72,7 +72,6 @@ public class GamePlayService {
 
         room.setCurrentAttackScenarioId(scenarioId);
         room.setGamePhase(GameRoom.GamePhase.ATTACK_OPTION_SELECT);
-        room.setLastActionMessage("Attack type selected: " + scenario.getName());
 
         return gameRoomRepository.save(room);
     }
@@ -82,12 +81,27 @@ public class GamePlayService {
         GameRoom room = getRoom(roomId);
         validateAttackerTurn(room);
 
+        // Check if max attacks limit reached
+        if (room.getCurrentLevelId() != null) {
+            Level level = levelRepository.findById(room.getCurrentLevelId())
+                    .orElseThrow(() -> new RuntimeException("Level not found"));
+
+            if (room.getAttacksPerformed() >= level.getMaxAttacks()) {
+                // Max attacks reached - end game
+                room.setGamePhase(GameRoom.GamePhase.GAME_OVER);
+                room.setStatus(GameRoom.RoomStatus.ROUND_OVER);
+                room.setLastActionMessage("Maximum attacks reached! Game over.");
+                return gameRoomRepository.save(room);
+            }
+        }
+
         AttackOption option = attackOptionRepository.findById(optionId)
                 .orElseThrow(() -> new RuntimeException("Attack Option not found"));
 
         room.setCurrentAttackOptionId(optionId);
         room.setGamePhase(GameRoom.GamePhase.DEFENDER_RESPONSE);
         room.setAttackerTurn(false);
+        room.setAttacksPerformed(room.getAttacksPerformed() + 1);
         room.setLastActionMessage("Attack launched: " + option.getLabel());
 
         return gameRoomRepository.save(room);
@@ -113,26 +127,9 @@ public class GamePlayService {
         room.setLastOutcome(choice.getOutcome());
         room.setLastActionMessage("Defender chose: " + choice.getLabel());
 
-        // Check if there's a follow-up or if this ends the scenario
-        if (choice.isEndsScenario() || choice.getFollowUpAttackOptionId() == null) {
-            // Move to next round or end game
-            room.setCurrentRound(room.getCurrentRound() + 1);
-
-            if (room.getCurrentRound() > room.getMaxRounds()) {
-                room.setGamePhase(GameRoom.GamePhase.GAME_OVER);
-                room.setStatus(GameRoom.RoomStatus.ROUND_OVER);
-            } else {
-                // Reset for next round
-                room.setGamePhase(GameRoom.GamePhase.OUTCOME_DISPLAY);
-                room.setCurrentAttackScenarioId(null);
-                room.setCurrentAttackOptionId(null);
-            }
-        } else {
-            // Continue to follow-up attack option
-            room.setCurrentAttackOptionId(choice.getFollowUpAttackOptionId());
-            room.setGamePhase(GameRoom.GamePhase.DEFENDER_RESPONSE);
-        }
-
+        // Reset for next round - attacker can now choose another attack
+        room.setGamePhase(GameRoom.GamePhase.OUTCOME_DISPLAY);
+        room.setCurrentAttackOptionId(null);
         room.setAttackerTurn(true);
 
         return gameRoomRepository.save(room);
@@ -165,6 +162,7 @@ public class GamePlayService {
         room.setCurrentRound(1);
         room.setAttackerScore(0);
         room.setDefenderScore(0);
+        room.setAttacksPerformed(0);
         room.setLastActionMessage("New game started!");
         room.setLastOutcome(null);
 
@@ -184,26 +182,34 @@ public class GamePlayService {
         state.setAttackerTurn(room.isAttackerTurn());
         state.setCurrentRound(room.getCurrentRound());
         state.setMaxRounds(room.getMaxRounds());
+        state.setAttacksPerformed(room.getAttacksPerformed());
         state.setLastActionMessage(room.getLastActionMessage());
         state.setLastOutcome(room.getLastOutcome());
         state.setStatus(room.getStatus().name());
 
-        // Load current level info
+        // Load current level info and set maxAttacks
         if (room.getCurrentLevelId() != null) {
             levelRepository.findById(room.getCurrentLevelId())
-                    .ifPresent(level -> state.setCurrentLevelName(level.getName()));
+                    .ifPresent(level -> {
+                        state.setCurrentLevelName(level.getName());
+                        state.setMaxAttacks(level.getMaxAttacks());
+                    });
         }
 
-        // Load defender profile info
+        // Load defender profile info (visible to both attacker and defender for
+        // strategy)
         if (room.getCurrentDefenderProfileId() != null) {
             defenderProfileRepository.findById(room.getCurrentDefenderProfileId())
                     .ifPresent(profile -> {
                         state.setDefenderProfileName(profile.getName());
                         state.setDefenderProfileDescription(profile.getDescription());
                         state.setDefenderAge(profile.getAge());
+                        state.setDefenderAgeGroup(profile.getAgeGroup());
                         state.setDefenderOccupation(profile.getOccupation());
-                        state.setDefenderRelationships(profile.getRelationships());
-                        state.setDefenderVulnerabilities(profile.getVulnerabilities());
+                        state.setDefenderTechSavviness(profile.getTechSavviness());
+                        state.setDefenderMentalState(profile.getMentalState());
+                        state.setDefenderFinancialStatus(profile.getFinancialStatus());
+                        state.setDefenderAvatarIcon(profile.getAvatarIcon());
                     });
         }
 
@@ -243,7 +249,7 @@ public class GamePlayService {
     public List<AttackOptionDto> getAttackOptions(Long scenarioId) {
         return attackOptionRepository.findByAttackScenarioId(scenarioId)
                 .stream()
-                .map(this::convertToAttackOptionDto)
+                .map(option -> convertToAttackOptionDto(option))
                 .collect(Collectors.toList());
     }
 
@@ -282,6 +288,7 @@ public class GamePlayService {
         dto.setDifficulty(level.getDifficulty());
         dto.setEnabled(level.isEnabled());
         dto.setOrderIndex(level.getOrderIndex());
+        dto.setMaxAttacks(level.getMaxAttacks());
         return dto;
     }
 
@@ -296,8 +303,6 @@ public class GamePlayService {
         dto.setTechSavviness(profile.getTechSavviness());
         dto.setMentalState(profile.getMentalState());
         dto.setFinancialStatus(profile.getFinancialStatus());
-        dto.setRelationships(profile.getRelationships());
-        dto.setVulnerabilities(profile.getVulnerabilities());
         dto.setAvatarIcon(profile.getAvatarIcon());
         return dto;
     }
@@ -334,11 +339,7 @@ public class GamePlayService {
         dto.setDefenderScoreDelta(choice.getDefenderScoreDelta());
         dto.setAttackerScoreDelta(choice.getAttackerScoreDelta());
         dto.setChoiceType(choice.getChoiceType());
-        dto.setCriticallyWrong(choice.isCriticallyWrong());
-        dto.setCriticallyRight(choice.isCriticallyRight());
         dto.setEducationalNote(choice.getEducationalNote());
-        dto.setFollowUpAttackOptionId(choice.getFollowUpAttackOptionId());
-        dto.setEndsScenario(choice.isEndsScenario());
         return dto;
     }
 }

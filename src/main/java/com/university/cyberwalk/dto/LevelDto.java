@@ -16,6 +16,7 @@ public class LevelDto {
     private String difficulty;
     private boolean enabled;
     private int orderIndex;
+    private int maxAttacks;
     private List<DefenderProfileDto> defenderProfiles;
     private List<AttackScenarioDto> attackScenarios;
 }

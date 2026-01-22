@@ -182,6 +182,7 @@ function populateLevelForm(level) {
   document.getElementById("levelDifficulty").value =
     level.difficulty || "MEDIUM";
   document.getElementById("levelOrder").value = level.orderIndex || 0;
+  document.getElementById("levelMaxAttacks").value = level.maxAttacks || 5;
   document.getElementById("levelEnabled").checked = level.enabled !== false;
 }
 
@@ -211,6 +212,7 @@ async function saveLevel(e) {
     description: document.getElementById("levelDescription").value,
     difficulty: document.getElementById("levelDifficulty").value,
     orderIndex: parseInt(document.getElementById("levelOrder").value) || 0,
+    maxAttacks: parseInt(document.getElementById("levelMaxAttacks").value) || 5,
     enabled: document.getElementById("levelEnabled").checked,
   };
 
@@ -384,8 +386,6 @@ async function saveDefenderProfile(e) {
     mentalState: document.getElementById("profileMentalState").value,
     financialStatus: document.getElementById("profileFinancialStatus").value,
     avatarIcon: document.getElementById("profileAvatar").value,
-    relationships: profileRelationships,
-    vulnerabilities: profileVulnerabilities,
   };
 
   try {
@@ -566,31 +566,6 @@ function toggleOption(id) {
   card.classList.toggle("expanded");
 }
 
-function findAttackOptionById(id) {
-  if (!id || !currentLevel) return null;
-  for (const scenario of currentLevel.attackScenarios || []) {
-    const option = (scenario.attackOptions || []).find((o) => o.id === id);
-    if (option) return option;
-  }
-  return null;
-}
-
-function getAllAttackOptions() {
-  if (!currentLevel) return [];
-  const options = [];
-  for (const scenario of currentLevel.attackScenarios || []) {
-    for (const option of scenario.attackOptions || []) {
-      options.push({
-        id: option.id,
-        label: option.label,
-        scenarioName: scenario.name,
-        description: option.description,
-      });
-    }
-  }
-  return options;
-}
-
 function renderDefenderChoices(choices, optionId, depth = 0) {
   if (!choices.length) {
     return `
@@ -602,54 +577,18 @@ function renderDefenderChoices(choices, optionId, depth = 0) {
 
   return choices
     .map((choice) => {
-      const followUpAttack = findAttackOptionById(
-        choice.followUpAttackOptionId,
-      );
-      const hasFollowUp = choice.followUpAttackOptionId && followUpAttack;
-
-      const indent = depth * 20;
-
       return `
-        <div class="defender-choice-item"
-             style="
-               margin-left: ${indent}px;
-               border-left: ${depth > 0 ? "3px solid rgba(0, 255, 255, 0.3)" : "none"};
-               padding-left: ${depth > 0 ? "10px" : "0"};
-             ">
+        <div class="defender-choice-item">
           
           <div class="choice-info">
             <h6>
-              ${depth > 0 ? "↳ " : ""}${choice.label}
+              ${choice.label}
 
               <span class="choice-type-badge ${
                 choice.choiceType?.toLowerCase() || "neutral"
               }">
                 ${choice.choiceType || "NEUTRAL"}
               </span>
-
-              ${
-                choice.criticallyWrong
-                  ? '<span class="choice-type-badge wrong">💀 Fatal</span>'
-                  : ""
-              }
-
-              ${
-                choice.criticallyRight
-                  ? '<span class="choice-type-badge correct">⭐ Perfect</span>'
-                  : ""
-              }
-
-              ${
-                hasFollowUp
-                  ? '<span class="choice-type-badge" style="background: rgba(100, 200, 255, 0.2); color: #64c8ff;">🔗 Has Follow-up</span>'
-                  : ""
-              }
-
-              ${
-                !choice.endsScenario && !hasFollowUp
-                  ? '<span class="choice-type-badge" style="background: rgba(255, 165, 0, 0.2); color: #ffa500;">⚠ No End/Follow-up</span>'
-                  : ""
-              }
             </h6>
 
             <p>${choice.description || choice.outcome || "No description"}</p>
@@ -671,20 +610,6 @@ function renderDefenderChoices(choices, optionId, depth = 0) {
                 ${choice.attackerScoreDelta}
               </span>
             </div>
-
-            ${
-              hasFollowUp
-                ? `
-                <div class="follow-up-indicator"
-                     style="margin-top: .5rem; padding: .5rem; background: rgba(100,200,255,.1); border-left: 3px solid #64c8ff;">
-                  <strong>→ Leads to:</strong> ${followUpAttack.label}
-                  <small style="display:block;color:#888;margin-top:.25rem;">
-                    ${followUpAttack.description || "Next attack in decision tree"}
-                  </small>
-                </div>
-              `
-                : ""
-            }
           </div>
 
           <div class="item-card-actions">
@@ -896,27 +821,12 @@ function addDefenderChoice(attackOptionId) {
   document.getElementById("choiceId").value = "";
   document.getElementById("choiceAttackOptionId").value = attackOptionId;
   document.getElementById("defenderChoiceForm").reset();
-  document.getElementById("choiceEndsScenario").checked = true;
 
-  populateFollowUpAttackOptions(attackOptionId);
   openModal("defenderChoiceModal");
 }
 
 function populateFollowUpAttackOptions(currentAttackOptionId) {
-  const select = document.getElementById("choiceFollowUpAttack");
-  const allOptions = getAllAttackOptions();
-
-  select.innerHTML = '<option value="">-- None (ends this branch) --</option>';
-
-  allOptions.forEach((opt) => {
-    // Don't allow self-reference to prevent infinite loops
-    if (opt.id !== currentAttackOptionId) {
-      const option = document.createElement("option");
-      option.value = opt.id;
-      option.textContent = `[${opt.scenarioName}] ${opt.label}`;
-      select.appendChild(option);
-    }
-  });
+  // This function is no longer needed but kept for backward compatibility
 }
 
 function editDefenderChoice(id, attackOptionId) {
@@ -947,18 +857,8 @@ function editDefenderChoice(id, attackOptionId) {
   document.getElementById("choiceAttackerScore").value =
     choice.attackerScoreDelta || 0;
   document.getElementById("choiceType").value = choice.choiceType || "NEUTRAL";
-  document.getElementById("choiceCriticallyWrong").checked =
-    choice.criticallyWrong || false;
-  document.getElementById("choiceCriticallyRight").checked =
-    choice.criticallyRight || false;
-  document.getElementById("choiceEndsScenario").checked =
-    choice.endsScenario !== false;
   document.getElementById("choiceEducationalNote").value =
     choice.educationalNote || "";
-
-  populateFollowUpAttackOptions(attackOptionId);
-  document.getElementById("choiceFollowUpAttack").value =
-    choice.followUpAttackOptionId || "";
 
   openModal("defenderChoiceModal");
 }
@@ -969,8 +869,6 @@ async function saveDefenderChoice(e) {
   const choiceId = document.getElementById("choiceId").value;
   const attackOptionId = document.getElementById("choiceAttackOptionId").value;
 
-  const followUpValue = document.getElementById("choiceFollowUpAttack").value;
-
   const choiceData = {
     label: document.getElementById("choiceLabel").value,
     description: document.getElementById("choiceDescription").value,
@@ -980,11 +878,7 @@ async function saveDefenderChoice(e) {
     attackerScoreDelta:
       parseInt(document.getElementById("choiceAttackerScore").value) || 0,
     choiceType: document.getElementById("choiceType").value,
-    criticallyWrong: document.getElementById("choiceCriticallyWrong").checked,
-    criticallyRight: document.getElementById("choiceCriticallyRight").checked,
-    endsScenario: document.getElementById("choiceEndsScenario").checked,
     educationalNote: document.getElementById("choiceEducationalNote").value,
-    followUpAttackOptionId: followUpValue ? parseInt(followUpValue) : null,
   };
 
   try {

@@ -19,7 +19,5 @@ public class DefenderProfileDto {
     private String techSavviness;
     private String mentalState;
     private String financialStatus;
-    private List<String> relationships;
-    private List<String> vulnerabilities;
     private String avatarIcon;
 }

@@ -35,6 +35,8 @@ public class Level {
     @Column(nullable = false)
     private int orderIndex = 0;
 
+    private int maxAttacks = 5; // Maximum number of attacks the attacker can perform
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

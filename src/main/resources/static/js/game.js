@@ -118,16 +118,17 @@ function updateScoreDeltas(state) {
 }
 
 function updateRoundInfo(state) {
-  const elements = ["atkRoundNum", "defRoundNum"];
-  elements.forEach((id) => {
+  // Update attack counter for both attacker and defender
+  const attackElements = ["atkAttacksPerformed", "defAttacksPerformed"];
+  attackElements.forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = state.currentRound;
+    if (el) el.textContent = state.attacksPerformed || 0;
   });
 
-  const maxElements = ["atkMaxRounds", "defMaxRounds"];
-  maxElements.forEach((id) => {
+  const maxAttackElements = ["atkMaxAttacks", "defMaxAttacks"];
+  maxAttackElements.forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = state.maxRounds;
+    if (el) el.textContent = state.maxAttacks || 5;
   });
 }
 
@@ -147,12 +148,20 @@ function updateAttackerUI(state) {
       document.getElementById("atkLevelSelect").classList.remove("hidden");
       break;
     case "PROFILE_SELECT":
-      document.getElementById("atkProfileInfo").classList.remove("hidden");
-      displayTargetProfile(state);
+      // Profile is auto-selected, show profile info
+      if (state.defenderProfileName) {
+        document.getElementById("atkProfileInfo").classList.remove("hidden");
+        displayTargetProfile(state);
+      }
       break;
     case "ATTACK_TYPE_SELECT":
       document.getElementById("atkTypeSelect").classList.remove("hidden");
       renderAttackTypeCards(); // Render the attack type cards
+      // Display target profile info if available
+      if (state.defenderProfileName) {
+        document.getElementById("atkProfileInfo").classList.remove("hidden");
+        displayTargetProfile(state);
+      }
       break;
     case "ATTACK_OPTION_SELECT":
       document.getElementById("atkOptionSelect").classList.remove("hidden");
@@ -267,35 +276,25 @@ async function selectLevel(levelId) {
 }
 
 function displayTargetProfile(state) {
-  const profile =
-    gameState.profiles.find((p) => p.id === gameState.currentProfileId) ||
-    gameState.profiles[0];
-  if (!profile) return;
+  if (!state.defenderProfileName) return;
 
   document.getElementById("targetAvatar").textContent =
-    profile.avatarIcon || "👤";
-  document.getElementById("targetName").textContent = profile.name;
+    state.defenderAvatarIcon || "👤";
+  document.getElementById("targetName").textContent = state.defenderProfileName;
   document.getElementById("targetDescription").textContent =
-    profile.description || "";
-  document.getElementById("targetAge").textContent = profile.age;
+    state.defenderProfileDescription || "";
+  document.getElementById("targetAge").textContent =
+    state.defenderAge || "Unknown";
+  document.getElementById("targetAgeGroup").textContent =
+    state.defenderAgeGroup || "Unknown";
   document.getElementById("targetOccupation").textContent =
-    profile.occupation || "Unknown";
+    state.defenderOccupation || "Unknown";
   document.getElementById("targetTechLevel").textContent =
-    profile.techSavviness || "Unknown";
+    state.defenderTechSavviness || "Unknown";
   document.getElementById("targetMentalState").textContent =
-    profile.mentalState || "Unknown";
-
-  // Relationships
-  const relContainer = document.getElementById("targetRelationships");
-  relContainer.innerHTML = (profile.relationships || [])
-    .map((r) => `<span class="tag">${r}</span>`)
-    .join("");
-
-  // Vulnerabilities
-  const vulnContainer = document.getElementById("targetVulnerabilities");
-  vulnContainer.innerHTML = (profile.vulnerabilities || [])
-    .map((v) => `<span class="tag">${v}</span>`)
-    .join("");
+    state.defenderMentalState || "Unknown";
+  document.getElementById("targetFinancialStatus").textContent =
+    state.defenderFinancialStatus || "Unknown";
 }
 
 async function proceedToAttackTypes() {
@@ -484,6 +483,30 @@ function showDefenderGame() {
 function updateDefenderUI(state) {
   hideAllDefenderPhases();
 
+  // Show defender profile if available
+  if (state.defenderProfileName) {
+    const profileDisplay = document.getElementById("defenderProfileDisplay");
+    if (profileDisplay) {
+      profileDisplay.style.display = "block";
+      document.getElementById("defProfileName").textContent =
+        state.defenderProfileName || "-";
+      document.getElementById("defProfileAge").textContent =
+        state.defenderAge || "-";
+      document.getElementById("defProfileAgeGroup").textContent =
+        state.defenderAgeGroup || "-";
+      document.getElementById("defProfileOccupation").textContent =
+        state.defenderOccupation || "-";
+      document.getElementById("defProfileTechLevel").textContent =
+        state.defenderTechSavviness || "-";
+      document.getElementById("defProfileMentalState").textContent =
+        state.defenderMentalState || "-";
+      document.getElementById("defProfileFinancialStatus").textContent =
+        state.defenderFinancialStatus || "-";
+      document.getElementById("defProfileDescription").textContent =
+        state.defenderProfileDescription || "";
+    }
+  }
+
   if (state.gamePhase === "DEFENDER_RESPONSE" && !state.isAttackerTurn) {
     document.getElementById("defUnderAttack").classList.remove("hidden");
     displayAttackToDefender(state);
@@ -605,13 +628,8 @@ function renderDefenderChoices() {
       .map(
         (choice) => `
         <div class="choice-card" onclick="makeDefenderChoice(${choice.id})">
-            <h4>${getChoiceIcon(choice.choiceType)} ${choice.label}</h4>
+            <h4>${choice.label}</h4>
             <p>${choice.description || ""}</p>
-            ${
-              choice.followUpAttackOptionId
-                ? '<span class="badge" style="background: rgba(100,200,255,0.2); color: #64c8ff; margin-top: 0.5rem; display: inline-block;">🔗 Continues scenario</span>'
-                : ""
-            }
         </div>
     `,
       )
@@ -619,16 +637,8 @@ function renderDefenderChoices() {
 }
 
 function getChoiceIcon(type) {
-  switch (type) {
-    case "CORRECT":
-      return "✅";
-    case "WRONG":
-      return "❌";
-    case "RISKY":
-      return "⚠️";
-    default:
-      return "🔵";
-  }
+  // This function is no longer used - kept for backward compatibility
+  return "";
 }
 
 async function makeDefaultChoice() {
@@ -657,7 +667,7 @@ async function makeDefaultChoice() {
 
 async function makeDefenderChoice(choiceId) {
   try {
-    // Find the choice to check for follow-up
+    // Find the choice to show educational note
     const choice = gameState.choices.find((c) => c.id === choiceId);
 
     await fetch(`${GAME_API}/${gameState.roomId}/defender-choice`, {
@@ -675,37 +685,16 @@ async function makeDefenderChoice(choiceId) {
             `;
     }
 
-    // Check if this choice has a follow-up attack option (decision tree continues)
-    if (choice && choice.followUpAttackOptionId) {
-      // Load the follow-up attack option and its choices
-      gameState.currentOptionId = choice.followUpAttackOptionId;
-
-      // Show a brief transition message
-      showFollowUpTransition(choice);
-
-      // Wait a moment then load new choices
-      setTimeout(async () => {
-        await loadDefenderChoices();
-      }, 2000);
-    } else {
-      // Reset for next round (scenario ends)
-      gameState.currentOptionId = null;
-      gameState.choices = [];
-    }
+    // Reset for next round - attacker chooses next attack
+    gameState.currentOptionId = null;
+    gameState.choices = [];
   } catch (error) {
     console.error("Error making choice:", error);
   }
 }
 
 function showFollowUpTransition(choice) {
-  const container = document.getElementById("defenderChoices");
-  container.innerHTML = `
-    <div class="transition-message" style="text-align: center; padding: 2rem;">
-      <div class="spinner"></div>
-      <h3 style="margin-top: 1rem; color: var(--accent-orange);">🔄 Situation Evolving...</h3>
-      <p style="color: var(--text-secondary);">The attacker is adapting to your response...</p>
-    </div>
-  `;
+  // This function is no longer used - kept for backward compatibility
 }
 
 async function defenderContinue() {

@@ -69,6 +69,10 @@
                                 <input type="number" id="levelOrder" value="0" min="0">
                             </div>
                             <div class="form-group">
+                                <label for="levelMaxAttacks">Max Attacks</label>
+                                <input type="number" id="levelMaxAttacks" value="5" min="1" max="20">
+                            </div>
+                            <div class="form-group">
                                 <label class="checkbox-label">
                                     <input type="checkbox" id="levelEnabled" checked>
                                     <span>Enabled</span>
@@ -333,43 +337,16 @@
                         <div class="form-group">
                             <label for="choiceType">Choice Type</label>
                             <select id="choiceType">
-                                <option value="CORRECT">Correct ✓</option>
-                                <option value="WRONG">Wrong ✗</option>
-                                <option value="RISKY">Risky ⚠</option>
+                                <option value="CORRECT">Correct</option>
+                                <option value="WRONG">Wrong</option>
+                                <option value="RISKY">Risky</option>
                                 <option value="NEUTRAL">Neutral</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="choiceCriticallyWrong">
-                                <span>Critically Wrong (Catastrophic)</span>
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="choiceCriticallyRight">
-                                <span>Critically Right (Perfect)</span>
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="choiceEndsScenario" checked>
-                                <span>Ends Scenario</span>
-                            </label>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="choiceEducationalNote">Educational Note</label>
                         <textarea id="choiceEducationalNote" rows="2" placeholder="Teaching moment - why is this good/bad?"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="choiceFollowUpAttack">Follow-Up Attack Option (for decision tree)</label>
-                        <select id="choiceFollowUpAttack">
-                            <option value="">-- None (ends this branch) --</option>
-                        </select>
-                        <small style="color: #888; display: block; margin-top: 0.25rem;">Select an attack option that triggers after this choice (creates decision tree)</small>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeModal('defenderChoiceModal')">Cancel</button>

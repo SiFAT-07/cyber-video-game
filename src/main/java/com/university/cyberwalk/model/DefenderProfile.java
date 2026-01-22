@@ -39,16 +39,6 @@ public class DefenderProfile {
 
     private String financialStatus; // STABLE, STRUGGLING, WEALTHY
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "defender_relationships", joinColumns = @JoinColumn(name = "profile_id"))
-    @Column(name = "relationship")
-    private List<String> relationships = new ArrayList<>(); // mother, father, partner, boss, bank, etc.
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "defender_vulnerabilities", joinColumns = @JoinColumn(name = "profile_id"))
-    @Column(name = "vulnerability")
-    private List<String> vulnerabilities = new ArrayList<>(); // trusting, impulsive, lonely, greedy, etc.
-
     @ManyToOne
     @JoinColumn(name = "level_id")
     @JsonIgnore
