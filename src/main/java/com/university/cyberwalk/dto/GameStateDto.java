@@ -14,6 +14,10 @@ public class GameStateDto {
     private String status;
     private String gamePhase;
 
+    // Player join status
+    private boolean defenderJoined;
+    private boolean attackerJoined;
+
     private int attackerScore;
     private int defenderScore;
 

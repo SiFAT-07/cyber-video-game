@@ -102,6 +102,13 @@ async function createRoom() {
     const response = await fetch(`${API_BASE_URL}/room/create`, {
       method: "POST",
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Server error:", text);
+      throw new Error(`Server error: ${response.status}`);
+    }
+
     const room = await response.json();
     myRoomId = room.roomId;
     document.getElementById("roomIdInput").value = myRoomId;
@@ -128,7 +135,11 @@ async function joinRoom() {
       body: JSON.stringify({ roomId: roomIdInput, role: roleSelect }),
     });
 
-    if (!response.ok) throw new Error("Join failed");
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Server error:", text);
+      throw new Error(`Join failed: ${response.status}`);
+    }
 
     const room = await response.json();
     myRoomId = room.roomId;
@@ -431,7 +442,7 @@ async function loadScenarioForDefender(videoId) {
       const currentTime = videoElement.currentTime;
       // Show options if ANY option in this scenario has reached its appearTime
       const shouldShow = currentScenarioOptions.some(
-        (opt) => opt.appearTime && currentTime >= opt.appearTime
+        (opt) => opt.appearTime && currentTime >= opt.appearTime,
       );
 
       if (
@@ -458,12 +469,12 @@ async function loadScenarioForDefender(videoId) {
       if (isLeaf) {
         if (nextSceneId) {
           console.log(
-            "Leaf node detected with next scene. Showing 'Next Scene' button."
+            "Leaf node detected with next scene. Showing 'Next Scene' button.",
           );
           showNextSceneButton(nextSceneId);
         } else {
           console.log(
-            "Final leaf node reached. Transitioning to game over soon."
+            "Final leaf node reached. Transitioning to game over soon.",
           );
         }
       } else {
@@ -474,7 +485,7 @@ async function loadScenarioForDefender(videoId) {
           currentScenarioOptions.length > 0
         ) {
           console.log(
-            "Main video ended without choices showing. Triggering fallback."
+            "Main video ended without choices showing. Triggering fallback.",
           );
           showOptions(currentScenarioOptions);
         } else {
@@ -549,7 +560,7 @@ function showGameOver(room) {
 
   const missionLog = document.getElementById("missionLog");
   const entries = Array.from(missionLog.querySelectorAll("li")).map(
-    (li) => li.innerText
+    (li) => li.innerText,
   );
 
   entries.forEach((entry) => {

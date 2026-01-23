@@ -188,6 +188,10 @@ public class GamePlayService {
         state.setLastDefenderScoreDelta(room.getLastDefenderScoreDelta());
         state.setLastAttackerScoreDelta(room.getLastAttackerScoreDelta());
         state.setStatus(room.getStatus().name());
+        
+        // Set player join status
+        state.setDefenderJoined(room.getDefenderSessionId() != null);
+        state.setAttackerJoined(room.getAttackerSessionId() != null);
 
         // Load current level info and set maxAttacks
         if (room.getCurrentLevelId() != null) {

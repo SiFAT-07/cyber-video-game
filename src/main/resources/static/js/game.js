@@ -16,6 +16,7 @@ let gameState = {
   scenarios: [],
   options: [],
   choices: [],
+  lastRenderedPhase: null, // Track last rendered phase to avoid re-rendering
 };
 
 // ========== INITIALIZATION ==========
@@ -168,7 +169,25 @@ function updateAttackerUI(state) {
 
   switch (state.gamePhase) {
     case "LEVEL_SELECT":
-      document.getElementById("atkLevelSelect").classList.remove("hidden");
+      // Only show level selection if defender has joined
+      if (state.defenderJoined) {
+        document.getElementById("atkLevelSelect").classList.remove("hidden");
+      } else {
+        // Show waiting message if no defender yet
+        document.getElementById("atkWaiting").classList.remove("hidden");
+        const waitingTitle = document.getElementById("attackLaunchedTitle");
+        const waitingMsg = document.getElementById("attackLaunchedMsg");
+        if (waitingTitle) {
+          waitingTitle.textContent = "Waiting for Opponent...";
+        }
+        if (waitingMsg) {
+          waitingMsg.textContent = "Waiting for defender to join the game...";
+        }
+        const attackPreviewSection = document.getElementById("attackPreview");
+        if (attackPreviewSection) {
+          attackPreviewSection.style.display = "none"; // Hide entire attack preview section
+        }
+      }
       break;
     case "PROFILE_SELECT":
       // Profile is auto-selected, show profile info
@@ -179,7 +198,10 @@ function updateAttackerUI(state) {
       break;
     case "ATTACK_TYPE_SELECT":
       document.getElementById("atkTypeSelect").classList.remove("hidden");
-      renderAttackTypeCards(); // Render the attack type cards
+      if (gameState.lastRenderedPhase !== "ATTACK_TYPE_SELECT") {
+        renderAttackTypeCards(); // Render the attack type cards
+        gameState.lastRenderedPhase = "ATTACK_TYPE_SELECT";
+      }
       // Display target profile info if available
       if (state.defenderProfileName) {
         document.getElementById("atkProfileInfo").classList.remove("hidden");
@@ -188,12 +210,30 @@ function updateAttackerUI(state) {
       break;
     case "ATTACK_OPTION_SELECT":
       document.getElementById("atkOptionSelect").classList.remove("hidden");
-      renderAttackOptionCards(); // Render the attack option cards
+      if (gameState.lastRenderedPhase !== "ATTACK_OPTION_SELECT") {
+        renderAttackOptionCards(); // Render the attack option cards
+        gameState.lastRenderedPhase = "ATTACK_OPTION_SELECT";
+      }
       break;
     case "DEFENDER_RESPONSE":
       document.getElementById("atkWaiting").classList.remove("hidden");
-      document.getElementById("attackPreviewContent").textContent =
-        state.lastActionMessage || "Attack in progress...";
+      const attackTitle = document.getElementById("attackLaunchedTitle");
+      const attackPreviewSection = document.getElementById("attackPreview");
+      const attackPreview = document.getElementById("attackPreviewContent");
+      const attackMsg = document.getElementById("attackLaunchedMsg");
+      if (attackTitle) {
+        attackTitle.textContent = "Attack Launched!";
+      }
+      if (attackPreviewSection) {
+        attackPreviewSection.style.display = ""; // Show entire attack preview section
+      }
+      if (attackPreview) {
+        attackPreview.textContent =
+          state.lastActionMessage || "Attack in progress...";
+      }
+      if (attackMsg) {
+        attackMsg.textContent = "Waiting for defender to respond...";
+      }
       break;
     case "OUTCOME_DISPLAY":
       document.getElementById("atkOutcome").classList.remove("hidden");
@@ -218,6 +258,7 @@ function hideAllAttackerPhases() {
     const el = document.getElementById(id);
     if (el) el.classList.add("hidden");
   });
+  // Don't reset lastRenderedPhase here - it should persist across phase visibility changes
 }
 
 async function loadLevels() {
@@ -471,6 +512,8 @@ async function selectAttackOption(optionId) {
       body: JSON.stringify({ optionId: optionId }),
     });
 
+    // Reset phase tracking so next phase will render fresh
+    gameState.lastRenderedPhase = null;
     // Polling will update UI to waiting state
   } catch (error) {
     console.error("Error selecting option:", error);
@@ -533,7 +576,10 @@ function updateDefenderUI(state) {
   if (state.gamePhase === "DEFENDER_RESPONSE" && !state.isAttackerTurn) {
     document.getElementById("defUnderAttack").classList.remove("hidden");
     displayAttackToDefender(state);
-    loadDefenderChoices();
+    if (gameState.lastRenderedPhase !== "DEFENDER_RESPONSE") {
+      loadDefenderChoices();
+      gameState.lastRenderedPhase = "DEFENDER_RESPONSE";
+    }
   } else if (state.gamePhase === "OUTCOME_DISPLAY") {
     document.getElementById("defOutcome").classList.remove("hidden");
     document.getElementById("defOutcomeMessage").textContent =
@@ -700,6 +746,9 @@ async function makeDefenderChoice(choiceId) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ choiceId: choiceId }),
     });
+
+    // Reset phase tracking so next phase will render fresh
+    gameState.lastRenderedPhase = null;
 
     // Show educational note if available
     if (choice && choice.educationalNote) {
