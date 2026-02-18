@@ -127,10 +127,26 @@ public class GamePlayService {
         room.setLastOutcome(choice.getOutcome());
         room.setLastActionMessage("Defender chose: " + choice.getLabel());
 
-        // Reset for next round - attacker can now choose another attack
-        room.setGamePhase(GameRoom.GamePhase.OUTCOME_DISPLAY);
+        // Reset for next round
         room.setCurrentAttackOptionId(null);
         room.setAttackerTurn(true);
+
+        // Check if max attacks reached - if so, game over
+        boolean gameOver = false;
+        if (room.getCurrentLevelId() != null) {
+            Level level = levelRepository.findById(room.getCurrentLevelId()).orElse(null);
+            if (level != null && room.getAttacksPerformed() >= level.getMaxAttacks()) {
+                gameOver = true;
+            }
+        }
+
+        if (gameOver) {
+            room.setGamePhase(GameRoom.GamePhase.GAME_OVER);
+            room.setStatus(GameRoom.RoomStatus.ROUND_OVER);
+            room.setLastActionMessage("All attacks completed! Game over.");
+        } else {
+            room.setGamePhase(GameRoom.GamePhase.OUTCOME_DISPLAY);
+        }
 
         return gameRoomRepository.save(room);
     }
@@ -140,6 +156,16 @@ public class GamePlayService {
         GameRoom room = getRoom(roomId);
 
         if (room.getGamePhase() == GameRoom.GamePhase.OUTCOME_DISPLAY) {
+            // Safety net: check if max attacks reached before allowing next round
+            if (room.getCurrentLevelId() != null) {
+                Level level = levelRepository.findById(room.getCurrentLevelId()).orElse(null);
+                if (level != null && room.getAttacksPerformed() >= level.getMaxAttacks()) {
+                    room.setGamePhase(GameRoom.GamePhase.GAME_OVER);
+                    room.setStatus(GameRoom.RoomStatus.ROUND_OVER);
+                    room.setLastActionMessage("All attacks completed! Game over.");
+                    return gameRoomRepository.save(room);
+                }
+            }
             room.setGamePhase(GameRoom.GamePhase.ATTACK_TYPE_SELECT);
             room.setLastOutcome(null);
             room.setLastActionMessage("Round " + room.getCurrentRound() + " begins!");
@@ -188,7 +214,7 @@ public class GamePlayService {
         state.setLastDefenderScoreDelta(room.getLastDefenderScoreDelta());
         state.setLastAttackerScoreDelta(room.getLastAttackerScoreDelta());
         state.setStatus(room.getStatus().name());
-        
+
         // Set player join status
         state.setDefenderJoined(room.getDefenderSessionId() != null);
         state.setAttackerJoined(room.getAttackerSessionId() != null);
