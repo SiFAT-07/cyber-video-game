@@ -49,7 +49,7 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 // Static Resources
                                                 .requestMatchers("/js/**", "/css/**", "/video/**", "/img/**",
-                                                                "/favicon.ico")
+                                                                "/favicon.ico", "/error")
                                                 .permitAll()
                                                 // APIs
                                                 .requestMatchers("/api/auth/**").permitAll() // Signup API
