@@ -772,8 +772,51 @@ function showFollowUpTransition(choice) {
 }
 
 async function defenderContinue() {
-  // Just let polling handle the state transition
-  pollGameState();
+  showGamePopup("Kindly wait for attacker to launch attack");
+}
+
+function showGamePopup(message) {
+  // Remove existing popup if any
+  const existing = document.getElementById("gamePopupOverlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "gamePopupOverlay";
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7); display: flex; align-items: center;
+    justify-content: center; z-index: 9999; backdrop-filter: blur(4px);
+  `;
+
+  const popup = document.createElement("div");
+  popup.style.cssText = `
+    background: linear-gradient(135deg, #12121f, #1a1a2e);
+    border: 1px solid #00ffff44; border-radius: 12px; padding: 2rem 2.5rem;
+    text-align: center; max-width: 420px; width: 90%;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), 0 0 60px rgba(0, 255, 255, 0.05);
+    animation: popupFadeIn 0.3s ease;
+  `;
+
+  popup.innerHTML = `
+    <div style="font-size: 2rem; margin-bottom: 0.8rem;">⏳</div>
+    <p style="color: #e8e8ff; font-size: 1.1rem; margin: 0 0 1.5rem 0; line-height: 1.5;
+       font-family: 'Courier New', monospace;">${message}</p>
+    <button onclick="document.getElementById('gamePopupOverlay').remove()" style="
+      background: linear-gradient(135deg, #00ffff, #00d4ff); color: #0a0a14;
+      border: none; padding: 0.6rem 2rem; border-radius: 6px; font-size: 1rem;
+      font-weight: bold; cursor: pointer; text-transform: uppercase;
+      letter-spacing: 1px; transition: all 0.2s;
+    " onmouseover="this.style.boxShadow='0 0 20px rgba(0,255,255,0.5)'"
+       onmouseout="this.style.boxShadow='none'">OK</button>
+  `;
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  // Close on overlay click (outside popup)
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
 }
 
 // ========== GAME OVER ==========

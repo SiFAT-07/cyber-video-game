@@ -23,17 +23,36 @@
 
         <!-- New Lobby Screen -->
         <section id="lobby-screen" class="screen">
-            <div class="lobby-content" style="position: absolute; bottom: 10%; width: 100%; padding: 0 5%;">
-                <h1
-                    style="font-size: 8rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 2rem; color: var(--accent-blue); text-shadow: 0 0 30px rgba(0, 210, 255, 0.5);">
-                    CYBERWALK</h1>
-                <div class="menu-items" style="display: flex; gap: 20px;">
-                    <button class="btn" onclick="startGame()">Play</button>
-                    <button class="btn" onclick="window.location.href='editor.html'">Level Editor</button>
-                    <button class="btn" onclick="showScreen('settings-overlay')">Settings</button>
-                    <button class="btn secondary" onclick="showScreen('tutorials-overlay')">Tutorials</button>
-                    <button class="btn" onclick="window.location.href='/logout'">Logout</button>
-                    <button class="btn" onclick="exitGame()">Exit Game</button>
+            <!-- Animated scan line overlay -->
+            <div class="lobby-scanlines"></div>
+            <!-- Floating particles -->
+            <div class="lobby-particles">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="lobby-content">
+                <div class="lobby-title-group">
+                    <h1 class="lobby-title">CYBERWALK</h1>
+                </div>
+                <div class="lobby-menu">
+                    <button class="lobby-btn lobby-btn-play" onclick="startGame()">
+                        PLAY
+                    </button>
+                    <button class="lobby-btn" onclick="window.location.href='editor.html'">
+                        LEVEL EDITOR
+                    </button>
+                    <button class="lobby-btn" onclick="showScreen('settings-overlay')">
+                        SETTINGS
+                    </button>
+                    <button class="lobby-btn lobby-btn-tutorials" onclick="showScreen('tutorials-overlay')">
+                        TUTORIALS
+                    </button>
+                    <button class="lobby-btn" onclick="window.location.href='/logout'">
+                        LOGOUT
+                    </button>
+                    <button class="lobby-btn lobby-btn-exit" onclick="exitGame()">
+                        EXIT GAME
+                    </button>
                 </div>
             </div>
         </section>
@@ -135,29 +154,54 @@
         </div>
     </div>
 
-    <!-- Existing Game (Hidden initially) -->
-    <!-- Room Selection Screen (Formerly lobbyScreen) -->
+    <!-- Room Selection Screen -->
     <div id="roomSelectionScreen" class="hidden">
-        <h1>CyberWalk: Duel Mode</h1>
-        <div class="lobby-controls">
-            <div class="card">
-                <h3>Create Room</h3>
-                <button id="createRoomBtn" class="btn btn-primary">Create New Room</button>
+        <div class="duel-scanlines"></div>
+        <div class="duel-content">
+            <div class="duel-header">
+                <p class="duel-label">SELECT YOUR BATTLEFIELD</p>
+                <h1 class="duel-title">DUEL <span class="duel-title-accent">MODE</span></h1>
+                <div class="duel-divider"><span></span><span class="duel-diamond">&#9670;</span><span></span></div>
             </div>
-            <div class="card">
-                <h3>Join Room</h3>
-                <input type="text" id="roomIdInput" placeholder="Enter Room ID">
-                <select id="roleSelect">
-                    <option value="ATTACKER">Attacker (Red Team)</option>
-                    <option value="DEFENDER">Defender (Blue Team)</option>
-                </select>
-                <button id="joinRoomBtn" class="btn btn-secondary">Join Game</button>
+
+            <div class="lobby-controls">
+                <!-- Create Room Card -->
+                <div class="duel-card duel-card-create">
+                    <div class="duel-card-glow create-glow"></div>
+                    <div class="duel-card-icon">&#128274;</div>
+                    <h3>Create Room</h3>
+                    <p class="duel-card-desc">Start a new battle arena and invite your opponent</p>
+                    <button id="createRoomBtn" class="duel-btn duel-btn-create">&#9889; CREATE NEW ROOM</button>
+                </div>
+
+                <!-- VS Separator -->
+                <div class="duel-vs">
+                    <div class="duel-vs-line"></div>
+                    <span class="duel-vs-text">VS</span>
+                    <div class="duel-vs-line"></div>
+                </div>
+
+                <!-- Join Room Card -->
+                <div class="duel-card duel-card-join">
+                    <div class="duel-card-glow join-glow"></div>
+                    <div class="duel-card-icon">&#127919;</div>
+                    <h3>Join Room</h3>
+                    <p class="duel-card-desc">Enter a room code to join an existing battle</p>
+                    <input type="text" id="roomIdInput" placeholder="&#128272; Enter Room ID">
+                    <select id="roleSelect">
+                        <option value="ATTACKER">&#9876;&#65039; Attacker (Red Team)</option>
+                        <option value="DEFENDER">&#128737;&#65039; Defender (Blue Team)</option>
+                    </select>
+                    <button id="joinRoomBtn" class="duel-btn duel-btn-join">&#128268; JOIN GAME</button>
+                </div>
             </div>
+
+            <div id="lobbyStatus" class="duel-status"></div>
+
+            <button class="duel-btn-back" onclick="showScreen('lobby-screen'); hideGameComponents();">
+                &#8592; BACK TO MAIN MENU
+            </button>
         </div>
-        <div id="lobbyStatus" class="status-msg"></div>
-        <!-- Back Button for Navigation -->
-        <button class="btn" onclick="showScreen('lobby-screen'); hideGameComponents();" style="margin-top: 2rem;">Back
-            to Main Menu</button>
     </div>
 
     <!-- NEW: Attacker Game Interface -->
