@@ -4,145 +4,299 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - CyberWalk</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        .auth-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            width: 100vw; height: 100vh;
             overflow: hidden;
+            background: #0a0e1a;
+            color: #cdd6f4;
         }
 
-        .auth-container::before {
+        /* ── Full-screen background ── */
+        .login-page {
+            position: relative;
+            width: 100%; height: 100%;
+            display: flex;
+            background: url('img/bg.png') no-repeat center center/cover;
+        }
+
+        .login-page::before {
             content: "";
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/bg.png');
-            background-size: cover;
-            background-position: center;
-            filter: blur(8px);
-            z-index: -1;
+            position: absolute; inset: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(6,8,18,0.92) 0%,
+                rgba(6,8,18,0.85) 38%,
+                rgba(6,8,18,0.45) 60%,
+                transparent 100%
+            );
+            z-index: 1;
         }
 
-        .auth-box {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 16px;
-            width: 400px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
-            text-align: center;
+        /* ── Left panel (form area) ── */
+        .login-panel {
+            position: relative; z-index: 2;
+            width: 440px; min-width: 360px;
+            height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center;
+            padding: 3rem 3.5rem;
         }
 
-        .auth-box h2 {
-            margin-bottom: 2rem;
-            color: #00d2ff;
+        /* ── Branding ── */
+        .login-brand {
+            position: absolute; top: 2rem; left: 3.5rem;
+            display: flex; align-items: center; gap: 0.7rem;
+            z-index: 3;
+        }
+        .login-brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #00d4ff, #0090ff);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .login-brand-icon svg { width: 18px; height: 18px; }
+        .login-brand-name {
+            font-size: 1rem; font-weight: 700;
+            color: #00d4ff; letter-spacing: 1.5px;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        .input-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
+        /* ── Heading ── */
+        .login-heading {
+            font-size: 2.4rem; font-weight: 900;
+            color: #ffffff; margin-bottom: 2.2rem;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
         }
 
-        .input-group label {
+        /* ── Form fields ── */
+        .login-field { margin-bottom: 1.4rem; }
+        .login-field-label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.9rem;
+            font-size: 0.82rem; font-weight: 600;
+            color: #a0aec0; margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
         }
+        .login-input-wrap {
+            position: relative;
+            display: flex; align-items: center;
+        }
+        .login-input-icon {
+            position: absolute; left: 14px;
+            color: #506080; font-size: 1rem;
+            pointer-events: none;
+            display: flex; align-items: center;
+        }
+        .login-input-icon svg { width: 18px; height: 18px; stroke: #506080; fill: none; }
 
-        .input-group input {
+        .login-field input {
             width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
+            padding: 14px 14px 14px 44px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
             outline: none;
-            border-color: #00d2ff;
+            transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+        }
+        .login-field input::placeholder { color: #4a5568; }
+        .login-field input:focus {
+            border-color: rgba(0,212,255,0.5);
+            border-bottom-color: #00d4ff;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 12px rgba(0,212,255,0.08);
         }
 
-        .btn-auth {
+        /* Password toggle */
+        .login-pw-toggle {
+            position: absolute; right: 14px;
+            background: none; border: none;
+            color: #506080; cursor: pointer;
+            display: flex; align-items: center;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .login-pw-toggle:hover { color: #00d4ff; }
+        .login-pw-toggle svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
+
+        /* ── Forgot password ── */
+        .login-forgot {
+            display: inline-block;
+            color: #64748b; font-size: 0.8rem;
+            text-decoration: none; margin-bottom: 1.8rem;
+            transition: color 0.2s;
+        }
+        .login-forgot:hover { color: #00d4ff; }
+
+        /* ── Submit button ── */
+        .login-submit {
             width: 100%;
-            margin-top: 1rem;
-            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-            border: none;
-            padding: 12px;
-            color: white;
-            font-weight: bold;
+            padding: 14px;
+            font-size: 1rem; font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: #fff;
+            background: linear-gradient(135deg, #00d4ff 0%, #3a8bd5 100%);
+            border: none; border-radius: 8px;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 20px rgba(0,212,255,0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .btn-auth:hover {
+        .login-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+            box-shadow: 0 6px 28px rgba(0,212,255,0.35);
         }
+        .login-submit:active { transform: translateY(0); }
 
-        .auth-link {
-            margin-top: 1.5rem;
-            display: block;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.9rem;
+        /* ── Sign-up link ── */
+        .login-signup {
+            margin-top: 1.8rem;
+            font-size: 0.85rem;
+            color: #64748b;
         }
-
-        .auth-link:hover {
-            color: #00d2ff;
+        .login-signup a {
+            color: #00d4ff; text-decoration: none;
+            font-weight: 600; transition: color 0.2s;
         }
+        .login-signup a:hover { color: #fff; }
 
-        .error-msg {
-            color: #ff4b2b;
+        /* ── Error message ── */
+        .login-error {
+            background: rgba(255,75,43,0.12);
+            border: 1px solid rgba(255,75,43,0.3);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #ff6b6b;
+            font-size: 0.85rem;
             margin-bottom: 1rem;
             display: none;
+        }
+
+        /* ── Footer ── */
+        .login-footer {
+            position: absolute; bottom: 2rem; left: 3.5rem;
+            font-size: 0.75rem; color: #3a4560;
+            letter-spacing: 0.5px;
+            z-index: 3;
+        }
+
+        /* ── Decorative scan-line overlay ── */
+        .login-scanlines {
+            position: absolute; inset: 0; z-index: 3;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg, transparent 0px, transparent 3px,
+                rgba(0,255,255,0.008) 3px, rgba(0,255,255,0.008) 4px
+            );
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .login-panel { width: 100%; padding: 2rem 2rem; }
+            .login-brand { left: 2rem; }
+            .login-footer { left: 2rem; }
+            .login-page::before {
+                background: rgba(6,8,18,0.88);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-box">
-            <h2>System Login</h2>
-            
-            <div id="error-msg" class="error-msg">Invaild credentials</div>
+    <div class="login-page">
+        <div class="login-scanlines"></div>
+
+        <!-- Branding -->
+        <div class="login-brand">
+            <div class="login-brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+            </div>
+            <span class="login-brand-name">CyberWalk</span>
+        </div>
+
+        <!-- Form Panel -->
+        <div class="login-panel">
+            <h1 class="login-heading">Login</h1>
+
+            <div id="error-msg" class="login-error">Invalid credentials. Please try again.</div>
 
             <form action="/login" method="post">
-                <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required autofocus>
+                <!-- Username -->
+                <div class="login-field">
+                    <label class="login-field-label">Username</label>
+                    <div class="login-input-wrap">
+                        <span class="login-input-icon">
+                            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </span>
+                        <input type="text" name="username" placeholder="Enter your username" required autofocus>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
+
+                <!-- Password -->
+                <div class="login-field">
+                    <label class="login-field-label">Password</label>
+                    <div class="login-input-wrap">
+                        <span class="login-input-icon">
+                            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                        <input type="password" name="password" id="passwordInput" placeholder="Enter your password" required>
+                        <button type="button" class="login-pw-toggle" onclick="togglePassword()">
+                            <svg id="eyeIcon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-auth">Authenticate</button>
+
+                <a href="#" class="login-forgot">Forgot Password?</a>
+
+                <button type="submit" class="login-submit">Log In</button>
             </form>
 
-            <a href="signup.html" class="auth-link">New User? Register Profile</a>
+            <p class="login-signup">Don't have an account? <a href="signup.html">Sign Up here</a></p>
         </div>
+
+        <!-- Footer -->
+        <div class="login-footer">&copy; 2026, CyberWalk</div>
     </div>
 
     <script>
+        // Show error if redirected with ?error
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('error')) {
-            const errorDiv = document.getElementById('error-msg');
-            errorDiv.style.display = 'block';
+            document.getElementById('error-msg').style.display = 'block';
+        }
+
+        // Toggle password visibility
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            }
         }
     </script>
 </body>
