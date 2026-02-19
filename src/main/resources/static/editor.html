@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberWalk - Level Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/editor.css">
+</head>
+
+<body>
+    <div id="editor-app">
+        <!-- Header -->
+        <header class="editor-header">
+            <h1><span class="accent">CYBER</span>WALK</h1>
+            <h2>Level Editor</h2>
+            <a href="index.html" class="btn btn-small">Back to Game</a>
+        </header>
+
+        <!-- Main Editor Container -->
+        <div class="editor-container">
+            <!-- Sidebar - Level List -->
+            <aside class="editor-sidebar">
+                <div class="sidebar-header">
+                    <h3>Levels</h3>
+                    <button class="btn btn-primary btn-small" onclick="createNewLevel()">+ New Level</button>
+                </div>
+                <div id="levelList" class="level-list">
+                    <!-- Levels will be loaded here -->
+                </div>
+            </aside>
+
+            <!-- Main Editor Panel -->
+            <main class="editor-main">
+                <!-- Level Info Panel -->
+                <section id="levelInfoPanel" class="editor-panel hidden">
+                    <div class="panel-header">
+                        <h3>Level Settings</h3>
+                        <div class="panel-actions">
+                            <button class="btn btn-danger btn-small" onclick="deleteCurrentLevel()">Delete Level</button>
+                        </div>
+                    </div>
+                    <form id="levelForm" class="editor-form">
+                        <input type="hidden" id="levelId">
+                        <div class="form-group">
+                            <label for="levelName">Level Name</label>
+                            <input type="text" id="levelName" placeholder="e.g., University Campus" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="levelDescription">Description</label>
+                            <textarea id="levelDescription" rows="3" placeholder="Describe the scenario setting..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="levelDifficulty">Difficulty</label>
+                                <select id="levelDifficulty">
+                                    <option value="EASY">Easy</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="HARD">Hard</option>
+                                    <option value="EXPERT">Expert</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="levelOrder">Order Index</label>
+                                <input type="number" id="levelOrder" value="0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="levelMaxAttacks">Max Attacks</label>
+                                <input type="number" id="levelMaxAttacks" value="5" min="1" max="20">
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="levelEnabled" checked>
+                                    <span>Enabled</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Level</button>
+                    </form>
+                </section>
+
+                <!-- Defender Profiles Panel -->
+                <section id="defenderProfilesPanel" class="editor-panel hidden">
+                    <div class="panel-header">
+                        <h3>Defender Profiles</h3>
+                        <button class="btn btn-secondary btn-small" onclick="addDefenderProfile()">+ Add Profile</button>
+                    </div>
+                    <div id="defenderProfilesList" class="items-grid">
+                        <!-- Profiles will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Attack Scenarios Panel -->
+                <section id="attackScenariosPanel" class="editor-panel hidden">
+                    <div class="panel-header">
+                        <h3>Attack Scenarios</h3>
+                        <button class="btn btn-secondary btn-small" onclick="addAttackScenario()">+ Add Attack Type</button>
+                    </div>
+                    <div id="attackScenariosList" class="items-list">
+                        <!-- Scenarios will be loaded here -->
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Modals -->
+        <!-- Defender Profile Modal -->
+        <div id="defenderProfileModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="profileModalTitle">Add Defender Profile</h3>
+                    <button class="modal-close" onclick="closeModal('defenderProfileModal')">&times;</button>
+                </div>
+                <form id="defenderProfileForm" class="editor-form">
+                    <input type="hidden" id="profileId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profileName">Profile Name</label>
+                            <input type="text" id="profileName" placeholder="e.g., University Student" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileAvatar">Avatar Icon</label>
+                            <select id="profileAvatar">
+                                <option value="👨‍🎓">👨‍🎓 Student</option>
+                                <option value="👩‍💼">👩‍💼 Professional</option>
+                                <option value="👴">👴 Elderly</option>
+                                <option value="👨‍💻">👨‍💻 Tech Worker</option>
+                                <option value="👩‍🏫">👩‍🏫 Teacher</option>
+                                <option value="🧑‍🔧">🧑‍🔧 Technician</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileDescription">Description</label>
+                        <textarea id="profileDescription" rows="2" placeholder="Brief description of this profile..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profileAge">Age</label>
+                            <input type="number" id="profileAge" value="25" min="10" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileAgeGroup">Age Group</label>
+                            <select id="profileAgeGroup">
+                                <option value="YOUNG">Young (18-30)</option>
+                                <option value="MIDDLE_AGED">Middle-Aged (31-55)</option>
+                                <option value="ELDERLY">Elderly (55+)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profileOccupation">Occupation</label>
+                            <input type="text" id="profileOccupation" placeholder="e.g., Student, Accountant">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileTechSavviness">Tech Savviness</label>
+                            <select id="profileTechSavviness">
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profileMentalState">Mental State</label>
+                            <select id="profileMentalState">
+                                <option value="CALM">Calm</option>
+                                <option value="STRESSED">Stressed</option>
+                                <option value="ANXIOUS">Anxious</option>
+                                <option value="DISTRACTED">Distracted</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileFinancialStatus">Financial Status</label>
+                            <select id="profileFinancialStatus">
+                                <option value="STABLE">Stable</option>
+                                <option value="STRUGGLING">Struggling</option>
+                                <option value="WEALTHY">Wealthy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Relationships (who can the attacker impersonate?)</label>
+                        <div id="relationshipsContainer" class="tags-container">
+                            <input type="text" id="relationshipInput" placeholder="Add relationship (press Enter)">
+                        </div>
+                        <div id="relationshipTags" class="tags-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Vulnerabilities</label>
+                        <div id="vulnerabilitiesContainer" class="tags-container">
+                            <input type="text" id="vulnerabilityInput" placeholder="Add vulnerability (press Enter)">
+                        </div>
+                        <div id="vulnerabilityTags" class="tags-display"></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('defenderProfileModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Attack Scenario Modal -->
+        <div id="attackScenarioModal" class="modal hidden">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3 id="scenarioModalTitle">Add Attack Scenario</h3>
+                    <button class="modal-close" onclick="closeModal('attackScenarioModal')">&times;</button>
+                </div>
+                <form id="attackScenarioForm" class="editor-form">
+                    <input type="hidden" id="scenarioId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="scenarioName">Scenario Name</label>
+                            <input type="text" id="scenarioName" placeholder="e.g., Phone Impersonation" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="scenarioAttackType">Attack Type</label>
+                            <select id="scenarioAttackType">
+                                <option value="FAKE_CALL">Fake Call</option>
+                                <option value="FAKE_SMS">Fake SMS</option>
+                                <option value="PHISHING_EMAIL">Phishing Email</option>
+                                <option value="FAKE_WIFI">Fake WiFi</option>
+                                <option value="SOCIAL_ENGINEERING">Social Engineering</option>
+                                <option value="MALWARE">Malware</option>
+                                <option value="FAKE_WEBSITE">Fake Website</option>
+                                <option value="USB_DROP">USB Drop</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="scenarioDescription">Description</label>
+                        <textarea id="scenarioDescription" rows="2" placeholder="What this attack type involves..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="scenarioNarrative">Attacker Narrative</label>
+                        <textarea id="scenarioNarrative" rows="2" placeholder="What the attacker sees/plans..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('attackScenarioModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Scenario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Attack Option Modal -->
+        <div id="attackOptionModal" class="modal hidden">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3 id="optionModalTitle">Add Attack Option</h3>
+                    <button class="modal-close" onclick="closeModal('attackOptionModal')">&times;</button>
+                </div>
+                <form id="attackOptionForm" class="editor-form">
+                    <input type="hidden" id="optionId">
+                    <input type="hidden" id="optionScenarioId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="optionLabel">Option Label</label>
+                            <input type="text" id="optionLabel" placeholder="e.g., Call as Mother" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="optionImpersonatedEntity">Impersonated Entity</label>
+                            <input type="text" id="optionImpersonatedEntity" placeholder="e.g., Mother, Bank, IT Support">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="optionDescription">Description</label>
+                        <textarea id="optionDescription" rows="2" placeholder="What this attack option does..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="optionAttackerMessage">Attacker Message</label>
+                        <textarea id="optionAttackerMessage" rows="3" placeholder="The message/call content the defender receives..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="optionBasePoints">Base Attacker Points</label>
+                            <input type="number" id="optionBasePoints" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="optionRiskLevel">Risk Level (1-5)</label>
+                            <input type="number" id="optionRiskLevel" value="1" min="1" max="5">
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="optionCriticalRisk">
+                                <span>Critical Risk (High stakes)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('attackOptionModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Option</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Defender Choice Modal -->
+        <div id="defenderChoiceModal" class="modal hidden">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3 id="choiceModalTitle">Add Defender Choice</h3>
+                    <button class="modal-close" onclick="closeModal('defenderChoiceModal')">&times;</button>
+                </div>
+                <form id="defenderChoiceForm" class="editor-form">
+                    <input type="hidden" id="choiceId">
+                    <input type="hidden" id="choiceAttackOptionId">
+                    <div class="form-group">
+                        <label for="choiceLabel">Choice Label</label>
+                        <input type="text" id="choiceLabel" placeholder="e.g., Hang up and verify" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="choiceDescription">Description</label>
+                        <textarea id="choiceDescription" rows="2" placeholder="What the defender does..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="choiceOutcome">Outcome</label>
+                        <textarea id="choiceOutcome" rows="3" placeholder="What happens as a result..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="choiceDefenderScore">Defender Score Change</label>
+                            <input type="number" id="choiceDefenderScore" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="choiceAttackerScore">Attacker Score Change</label>
+                            <input type="number" id="choiceAttackerScore" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="choiceType">Choice Type</label>
+                            <select id="choiceType">
+                                <option value="CORRECT">Correct</option>
+                                <option value="WRONG">Wrong</option>
+                                <option value="RISKY">Risky</option>
+                                <option value="NEUTRAL">Neutral</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="choiceEducationalNote">Educational Note</label>
+                        <textarea id="choiceEducationalNote" rows="2" placeholder="Teaching moment - why is this good/bad?"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('defenderChoiceModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Choice</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/editor.js"></script>
+</body>
+
+</html>

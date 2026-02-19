@@ -31,12 +31,54 @@ public class GameRoom {
     private int attackerScore = 0;
     private int defenderScore = 0;
 
-    private String currentVideoId; // Synced video state
+    private String currentVideoId; // Legacy - kept for compatibility
+
+    // New level-based game state
+    private Long currentLevelId;
+    private Long currentDefenderProfileId;
+    private Long currentAttackScenarioId;
+    private Long currentAttackOptionId;
+
+    // Game phase tracking
+    @Enumerated(EnumType.STRING)
+    private GamePhase gamePhase = GamePhase.LEVEL_SELECT;
+
+    // Turn tracking
+    private boolean isAttackerTurn = true;
+
+    // Round tracking
+    private int currentRound = 1;
+    private int maxRounds = 3;
+
+    // Attack count tracking
+    private int attacksPerformed = 0;
+
+    // Last action info for display
+    @Column(length = 1000)
+    private String lastActionMessage;
+
+    @Column(length = 2000)
+    private String lastOutcome;
+
+    // Last score deltas for display
+    private Integer lastDefenderScoreDelta = 0;
+    private Integer lastAttackerScoreDelta = 0;
 
     public enum RoomStatus {
         WAITING, // Waiting for 2nd player
-        ATTACK_SELECTION, // Attacker choosing attack
-        DEFENDER_TURN, // Defender making choices
+        ATTACK_SELECTION, // Attacker choosing attack (legacy)
+        DEFENDER_TURN, // Defender making choices (legacy)
+        PLAYING, // Game in progress
         ROUND_OVER // Round completed
+    }
+
+    public enum GamePhase {
+        LEVEL_SELECT, // Attacker selects a level
+        PROFILE_SELECT, // Shows defender profile info
+        ATTACK_TYPE_SELECT, // Attacker selects attack type
+        ATTACK_OPTION_SELECT, // Attacker selects specific attack option
+        DEFENDER_RESPONSE, // Defender responds to attack
+        OUTCOME_DISPLAY, // Show outcome of the round
+        GAME_OVER // Game finished
     }
 }

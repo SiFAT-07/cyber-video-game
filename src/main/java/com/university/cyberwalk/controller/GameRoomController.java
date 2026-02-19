@@ -42,4 +42,9 @@ public class GameRoomController {
             @Valid @RequestBody RoomRequests.DefenderActionRequest request) {
         return ResponseEntity.ok(gameRoomService.processAction(roomId, request.getOptionId()));
     }
+
+    @PutMapping("/{roomId}/video/{videoId}")
+    public ResponseEntity<GameRoom> updateVideo(@PathVariable String roomId, @PathVariable String videoId) {
+        return ResponseEntity.ok(gameRoomService.updateCurrentVideo(roomId, videoId));
+    }
 }

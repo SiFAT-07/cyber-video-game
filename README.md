@@ -7,6 +7,7 @@ An interactive video-based decision game built with Spring Boot backend and vani
 - **Full-screen Video Playback**: Videos play in full-screen with interactive overlays
 - **Decision Tree Structure**: Each scenario presents options that lead to different paths
 - **Dynamic Scoring System**: Choices affect the player's score (positive/negative/critical)
+- **Persistent Data Storage**: All user accounts and level editor data are saved permanently
 - **Mobile Responsive**: Works on desktop, tablet, and mobile devices
 - **REST API Backend**: Spring Boot handles game logic, scoring, and session management
 - **Video Controls**: Seek forward/backward through videos
@@ -16,7 +17,7 @@ An interactive video-based decision game built with Spring Boot backend and vani
 ### Backend
 - **Spring Boot 3.2.0**
 - **Spring Data JPA**
-- **H2 Database** (in-memory)
+- **H2 Database** (file-based for data persistence)
 - **Maven**
 
 ### Frontend

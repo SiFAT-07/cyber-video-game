@@ -2,7 +2,19 @@
 
 Welcome to **CyberWalk**, your interactive story-based game project!
 
-## 🚀 Quickest Way to Get Started
+## � Important: Data Persistence Enabled!
+
+Your application now uses a **persistent file-based database**:
+- ✅ **User accounts** are saved permanently
+- ✅ **Level editor data** persists across restarts
+- ✅ Data survives browser refresh, app restart, and works across different browsers
+- 📂 Database stored in: `./data/cyberwalk.*`
+
+**📖 For full details**, see: [`DATABASE_SETUP.md`](DATABASE_SETUP.md)
+
+---
+
+## �🚀 Quickest Way to Get Started
 
 ### Option 1: Express Start (3 Commands)
 ```powershell
