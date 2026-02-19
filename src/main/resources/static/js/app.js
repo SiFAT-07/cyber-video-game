@@ -645,7 +645,6 @@ document
   .getElementById("restartButton")
   .addEventListener("click", () => location.reload()); // Reloads page, restarting from loading screen
 
-// Expose functions to window for HTML onclick attributes
 window.startGame = startGame;
 window.showScreen = showScreen;
 window.exitGame = exitGame;
@@ -655,3 +654,42 @@ window.selectScenario = selectScenario;
 window.toggleAttack = toggleAttack;
 window.confirmAttack = confirmAttack;
 window.sendDefenderAction = sendDefenderAction;
+
+// --- Tutorial Video Functions ---
+
+function openTutorialVideo(videoSrc, title) {
+  const modal = document.getElementById('tutorialVideoModal');
+  const video = document.getElementById('tutorialVideoPlayer');
+  const titleEl = document.getElementById('tutorialVideoTitle');
+
+  if (!modal || !video) return;
+
+  titleEl.textContent = title || 'Tutorial';
+  video.src = videoSrc;
+  modal.classList.remove('hidden');
+  video.play().catch(e => console.log('Auto-play blocked:', e));
+}
+
+function closeTutorialVideo() {
+  const modal = document.getElementById('tutorialVideoModal');
+  const video = document.getElementById('tutorialVideoPlayer');
+
+  if (!modal || !video) return;
+
+  video.pause();
+  video.src = '';
+  modal.classList.add('hidden');
+}
+
+// Close tutorial modal on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('tutorialVideoModal');
+    if (modal && !modal.classList.contains('hidden')) {
+      closeTutorialVideo();
+    }
+  }
+});
+
+window.openTutorialVideo = openTutorialVideo;
+window.closeTutorialVideo = closeTutorialVideo;

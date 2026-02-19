@@ -31,7 +31,7 @@
                     <button class="btn" onclick="startGame()">Play</button>
                     <button class="btn" onclick="window.location.href='editor.html'">Level Editor</button>
                     <button class="btn" onclick="showScreen('settings-overlay')">Settings</button>
-                    <button class="btn secondary" onclick="showScreen('extras-overlay')">Extras</button>
+                    <button class="btn secondary" onclick="showScreen('tutorials-overlay')">Tutorials</button>
                     <button class="btn" onclick="window.location.href='/logout'">Logout</button>
                     <button class="btn" onclick="exitGame()">Exit Game</button>
                 </div>
@@ -67,23 +67,72 @@
             </div>
         </section>
 
-        <!-- Extras Overlay -->
-        <section id="extras-overlay" class="screen glass">
-            <div class="modal-content" style="width: 80%; max-width: 800px; padding: 40px; text-align: left;">
-                <h2
-                    style="font-size: 3rem; margin-bottom: 2rem; border-bottom: 2px solid var(--accent-orange); padding-bottom: 1rem;">
-                    EXTRAS</h2>
-                <div style="color: var(--text-secondary); line-height: 1.6; font-size: 1.1rem;">
-                    <p style="margin-bottom: 1.5rem;"><strong>Version:</strong> 1.0.15681</p>
-                    <p style="margin-bottom: 1.5rem;"><strong>Developer Notes:</strong> DISPATCH is a tactical narrative
-                        experience set in a near-future metropolitan area. Experience the life of an emergency responder
-                        in a world of high-tech surveillance and complex human stories.</p>
-                    <p>All assets and UI elements are designed to provide a seamless cinematic experience.</p>
+        <!-- Tutorials Overlay -->
+        <section id="tutorials-overlay" class="screen">
+            <div class="tutorials-container">
+                <div class="tutorials-header">
+                    <h2 class="tutorials-title">📚 TUTORIALS</h2>
+                    <p class="tutorials-subtitle">Learn to identify and defend against common cyber attacks</p>
                 </div>
-                <button class="btn secondary" style="margin-top: 3rem;"
-                    onclick="showScreen('lobby-screen')">Back</button>
+                <div class="tutorials-grid">
+                    <!-- Tutorial 1: Fake Link -->
+                    <div class="tutorial-card" onclick="openTutorialVideo('video/university_student_scenerio/fake_link/appear_fake_link_in_groupchat.mp4', 'Fake Link Attacks')">
+                        <div class="tutorial-icon">🔗</div>
+                        <div class="tutorial-info">
+                            <h3>Fake Link Attacks</h3>
+                            <p>Learn how attackers spread malicious phishing links through group chats and social media to steal your credentials.</p>
+                            <span class="tutorial-badge">Phishing</span>
+                        </div>
+                        <div class="tutorial-play">▶</div>
+                    </div>
+                    <!-- Tutorial 2: Fake Call -->
+                    <div class="tutorial-card" onclick="openTutorialVideo('video/university_student_scenerio/fake_call/fake_call_appear.mp4', 'Fake Call Scams')">
+                        <div class="tutorial-icon">📞</div>
+                        <div class="tutorial-info">
+                            <h3>Fake Call Scams</h3>
+                            <p>Understand how scammers impersonate family members or authorities to manipulate you into sharing sensitive information.</p>
+                            <span class="tutorial-badge">Social Engineering</span>
+                        </div>
+                        <div class="tutorial-play">▶</div>
+                    </div>
+                    <!-- Tutorial 3: Spam Mail -->
+                    <div class="tutorial-card" onclick="openTutorialVideo('video/university_student_scenerio/spam_mail/spam_mail_coming.mp4', 'Spam Mail Threats')">
+                        <div class="tutorial-icon">📧</div>
+                        <div class="tutorial-info">
+                            <h3>Spam Mail Threats</h3>
+                            <p>Discover how to detect and handle suspicious emails that may contain malware or deceptive scholarship scams.</p>
+                            <span class="tutorial-badge">Email Security</span>
+                        </div>
+                        <div class="tutorial-play">▶</div>
+                    </div>
+                    <!-- Tutorial 4: Evil Twin WiFi -->
+                    <div class="tutorial-card" onclick="openTutorialVideo('video/university_student_scenerio/wifi_issue/wifi_problem.mp4', 'Evil Twin WiFi')">
+                        <div class="tutorial-icon">📶</div>
+                        <div class="tutorial-info">
+                            <h3>Evil Twin WiFi</h3>
+                            <p>See how attackers set up fake WiFi networks that mimic legitimate ones to intercept your data and credentials.</p>
+                            <span class="tutorial-badge">Network Security</span>
+                        </div>
+                        <div class="tutorial-play">▶</div>
+                    </div>
+                </div>
+                <button class="btn secondary" style="margin-top: 2rem;" onclick="showScreen('lobby-screen')">Back to Lobby</button>
             </div>
         </section>
+
+        <!-- Tutorial Video Modal -->
+        <div id="tutorialVideoModal" class="tutorial-modal hidden">
+            <div class="tutorial-modal-backdrop" onclick="closeTutorialVideo()"></div>
+            <div class="tutorial-video-content">
+                <div class="tutorial-modal-header">
+                    <h3 id="tutorialVideoTitle">Tutorial</h3>
+                    <button class="tutorial-close-btn" onclick="closeTutorialVideo()">✕</button>
+                </div>
+                <video id="tutorialVideoPlayer" controls preload="metadata">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
     </div>
 
     <!-- Existing Game (Hidden initially) -->
