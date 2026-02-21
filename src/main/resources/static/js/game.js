@@ -172,6 +172,11 @@ function updateAttackerUI(state) {
       // Only show level selection if defender has joined
       if (state.defenderJoined) {
         document.getElementById("atkLevelSelect").classList.remove("hidden");
+        // Trigger staggered entrance animation only once
+        if (gameState.lastRenderedPhase !== "LEVEL_SELECT") {
+          initLevelSlider();
+          gameState.lastRenderedPhase = "LEVEL_SELECT";
+        }
       } else {
         // Show waiting message if no defender yet
         document.getElementById("atkWaiting").classList.remove("hidden");
@@ -274,6 +279,9 @@ async function loadLevels() {
 function renderLevelCards() {
   const container = document.getElementById("levelCards");
 
+  // Reset any leftover animation classes from previous play
+  container.classList.remove("grid-exit");
+
   if (gameState.levels.length === 0) {
     container.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
@@ -287,17 +295,49 @@ function renderLevelCards() {
 
   container.innerHTML = gameState.levels
     .map(
-      (level) => `
-        <div class="selection-card" onclick="selectLevel(${level.id})">
-            <h3>🏢 ${level.name}</h3>
-            <p>${level.description || "No description"}</p>
-            <div class="card-meta">
-                <span class="badge">${level.difficulty}</span>
+      (level, index) => `
+        <div class="selection-card card-stagger-in"
+             style="animation-delay: ${index * 0.12}s"
+             tabindex="0"
+             role="button"
+             aria-label="Select ${level.name}"
+             data-level-id="${level.id}">
+            <div class="card-inner">
+                <h3>🏢 ${level.name}</h3>
+                <p>${level.description || "No description"}</p>
+                <div class="card-meta">
+                    <span class="badge">${level.difficulty}</span>
+                </div>
             </div>
         </div>
     `,
     )
     .join("");
+
+  // Attach click & keyboard handlers with exit animation
+  container.querySelectorAll(".selection-card[data-level-id]").forEach((card) => {
+    const levelId = parseInt(card.dataset.levelId, 10);
+
+    const handleActivate = () => {
+      // Prevent double-click
+      if (container.classList.contains("grid-exit")) return;
+      // Play grid exit animation then proceed
+      container.classList.add("grid-exit");
+      const duration = getComputedStyle(document.documentElement)
+        .getPropertyValue("--card-exit-duration") || "350ms";
+      setTimeout(() => {
+        selectLevel(levelId);
+      }, parseInt(duration));
+    };
+
+    card.addEventListener("click", handleActivate);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleActivate();
+      }
+    });
+  });
 }
 
 async function selectLevel(levelId) {
@@ -883,6 +923,7 @@ function exitToLobby() {
     scenarios: [],
     options: [],
     choices: [],
+    lastRenderedPhase: null,
   };
 
   document.getElementById("attackerGameArea").classList.add("hidden");
@@ -892,6 +933,145 @@ function exitToLobby() {
 
   showScreen("lobby-screen");
   if (app) app.style.display = "block";
+}
+
+// ========== LEVEL-SELECT HORIZONTAL SLIDER ==========
+
+let sliderIndex = 0;
+
+function initLevelSlider() {
+  const container = document.getElementById("levelCards");
+  if (!container || container.querySelector(".works-slider")) return; // already wrapped
+
+  const cards = [...container.querySelectorAll(".selection-card")];
+  if (cards.length === 0) return;
+
+  // Build slider DOM around existing cards (cards keep all data-attrs & handlers)
+  const slider = document.createElement("div");
+  slider.className = "works-slider";
+
+  const viewport = document.createElement("div");
+  viewport.className = "works-viewport";
+
+  const track = document.createElement("div");
+  track.className = "works-track";
+  cards.forEach((c) => { c.classList.remove("card-stagger-in"); track.appendChild(c); });
+  viewport.appendChild(track);
+
+  // Nav buttons
+  const prev = document.createElement("button");
+  prev.className = "works-prev"; prev.innerHTML = "&#8249;"; prev.setAttribute("aria-label","Previous");
+  const next = document.createElement("button");
+  next.className = "works-next"; next.innerHTML = "&#8250;"; next.setAttribute("aria-label","Next");
+  slider.appendChild(prev); slider.appendChild(viewport); slider.appendChild(next);
+
+  // Dots
+  const dots = document.createElement("div"); dots.className = "works-dots";
+  cards.forEach((_, i) => { const d = document.createElement("span"); d.className = "works-dot"; d.addEventListener("click", () => { sliderIndex = i; updateSlider(); }); dots.appendChild(d); });
+
+  container.innerHTML = "";
+  container.appendChild(slider);
+  slider.appendChild(dots);
+
+  sliderIndex = 0;
+  updateSlider();
+
+  // --- Nav buttons ---
+  prev.addEventListener("click", () => { if (sliderIndex > 0) { sliderIndex--; updateSlider(); } });
+  next.addEventListener("click", () => { if (sliderIndex < cards.length - 1) { sliderIndex++; updateSlider(); } });
+
+  // --- Wheel (vertical → horizontal) ---
+  let wheelCooldown = false;
+  slider.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    if (wheelCooldown) return;
+    if (Math.abs(e.deltaY) > 20) {
+      sliderIndex = Math.max(0, Math.min(cards.length - 1, sliderIndex + (e.deltaY > 0 ? 1 : -1)));
+      updateSlider(); wheelCooldown = true; setTimeout(() => wheelCooldown = false, 350);
+    }
+  }, { passive: false });
+
+  // --- Drag / swipe (pointer events) ---
+  let startX = 0, dragging = false, startTx = 0, pointerDown = false, pendingPointerId = null;
+  const DRAG_THRESHOLD = 5; // px – movements smaller than this count as a click
+  track.addEventListener("pointerdown", (e) => {
+    if (e.button && e.button !== 0) return;
+    pointerDown = true; dragging = false; startX = e.clientX;
+    startTx = parseFloat(track.style.transform.replace(/[^-\d.]/g, "") || 0);
+    pendingPointerId = e.pointerId;
+  });
+  track.addEventListener("pointermove", (e) => {
+    if (!pointerDown) return;
+    const dx = e.clientX - startX;
+    if (!dragging && Math.abs(dx) >= DRAG_THRESHOLD) {
+      dragging = true;
+      track.classList.add("is-dragging");
+      track.setPointerCapture(pendingPointerId);
+    }
+    if (dragging) {
+      track.style.transform = `translateX(${startTx + dx}px)`;
+    }
+  });
+  const endDrag = (e) => {
+    if (!pointerDown) return;
+    pointerDown = false;
+    if (dragging) {
+      dragging = false; track.classList.remove("is-dragging");
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 60) sliderIndex = Math.max(0, Math.min(cards.length - 1, sliderIndex + (dx < 0 ? 1 : -1)));
+      updateSlider();
+    }
+    // If not dragging, the click event fires normally on the card
+  };
+  track.addEventListener("pointerup", endDrag);
+  track.addEventListener("pointercancel", endDrag);
+
+  // --- Keyboard ---
+  slider.setAttribute("tabindex", "0");
+  slider.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { sliderIndex = Math.max(0, sliderIndex - 1); updateSlider(); e.preventDefault(); }
+    if (e.key === "ArrowRight") { sliderIndex = Math.min(cards.length - 1, sliderIndex + 1); updateSlider(); e.preventDefault(); }
+  });
+}
+
+function updateSlider() {
+  const slider = document.querySelector("#levelCards .works-slider");
+  if (!slider) return;
+  const viewport = slider.querySelector(".works-viewport");
+  const track = slider.querySelector(".works-track");
+  const cards = [...track.children];
+  if (!cards.length) return;
+
+  const vpStyle = getComputedStyle(viewport);
+  const padL = parseFloat(vpStyle.paddingLeft) || 0;
+  const padR = parseFloat(vpStyle.paddingRight) || 0;
+  const contentW = viewport.clientWidth - padL - padR;
+  const cardW = cards[0].offsetWidth;
+  const gap = parseFloat(getComputedStyle(track).gap) || 28;
+  const step = cardW + gap;
+
+  // Center active card within the content area of the viewport
+  let offset = (contentW / 2) - (cardW / 2) - sliderIndex * step;
+
+  // Clamp so adjacent cards peek symmetrically at both edges
+  if (cards.length > 1) {
+    const maxOff = (contentW / 2) - (cardW / 2);
+    const minOff = (contentW / 2) - (cardW / 2) - (cards.length - 1) * step;
+    if (maxOff > minOff) {
+      offset = Math.max(minOff, Math.min(maxOff, offset));
+    }
+  }
+
+  track.style.transform = `translateX(${offset}px)`;
+  cards.forEach((c, i) => c.classList.toggle("works-active", i === sliderIndex));
+  // Dots
+  const dots = document.querySelectorAll("#levelCards .works-dot");
+  dots.forEach((d, i) => d.classList.toggle("active", i === sliderIndex));
+  // Buttons
+  const prev = slider.querySelector(".works-prev");
+  const next = slider.querySelector(".works-next");
+  if (prev) prev.disabled = sliderIndex === 0;
+  if (next) next.disabled = sliderIndex === cards.length - 1;
 }
 
 // Export for use in app.js
