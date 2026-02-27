@@ -48,20 +48,14 @@
         }
 
         /* ── Branding ── */
-        .login-brand {
+        .page-brand-title {
             position: absolute; top: 2rem; left: 3.5rem;
             display: flex; align-items: center; gap: 0.7rem;
             z-index: 3;
         }
-        .login-brand-icon {
-            width: 32px; height: 32px;
-            background: linear-gradient(135deg, #00d4ff, #0090ff);
-            border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .login-brand-icon svg { width: 18px; height: 18px; }
-        .login-brand-name {
-            font-size: 1rem; font-weight: 700;
+        .page-brand-title svg { width: 32px; height: 32px; }
+        .page-brand-title-name {
+            font-size: 2rem; font-weight: 700;
             color: #00d4ff; letter-spacing: 1.5px;
             text-transform: uppercase;
         }
@@ -201,7 +195,6 @@
         /* ── Responsive ── */
         @media (max-width: 600px) {
             .login-panel { width: 100%; padding: 2rem 2rem; }
-            .login-brand { left: 2rem; }
             .login-footer { left: 2rem; }
             .login-page::before {
                 background: rgba(6,8,18,0.88);
@@ -214,17 +207,7 @@
         <div class="login-scanlines"></div>
 
         <!-- Branding -->
-        <div class="login-brand">
-            <div class="login-brand-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/>
-                    <rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/>
-                    <rect x="14" y="14" width="7" height="7" rx="1"/>
-                </svg>
-            </div>
-            <span class="login-brand-name">CyberWalk</span>
-        </div>
+        <span class="page-brand-title login-page-brand-title page-brand-title-name">CYBERWALK</span>
 
         <!-- Form Panel -->
         <div class="login-panel">
