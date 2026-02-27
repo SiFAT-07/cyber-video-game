@@ -157,6 +157,10 @@
     <!-- Room Selection Screen -->
     <div id="roomSelectionScreen" class="hidden">
         <div class="duel-scanlines"></div>
+        <h1 class="page-brand-title">CYBERWALK</h1>
+        <button class="duel-btn-back duel-btn-back-top" onclick="showScreen('lobby-screen'); hideGameComponents();">
+            &#8592; BACK
+        </button>
         <div class="duel-content">
             <div class="duel-header">
                 <p class="duel-label">SELECT YOUR BATTLEFIELD</p>
@@ -198,9 +202,7 @@
 
             <div id="lobbyStatus" class="duel-status"></div>
 
-            <button class="duel-btn-back" onclick="showScreen('lobby-screen'); hideGameComponents();">
-                &#8592; BACK TO MAIN MENU
-            </button>
+
         </div>
     </div>
 
